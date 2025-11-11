@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "zbiorkom.live",
+    "slug": "zbiorkom",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "zbiorkom",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "userInterfaceStyle": "automatic",
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/foreground.png",
+        "monochromeImage": "./assets/images/monochrome.png"
+      },
+      "userInterfaceStyle": "automatic",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.zbiorkom.live"
+    },
+    "plugins": [
+      "expo-router",
+      "@maplibre/maplibre-react-native",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#286a2c"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "963b6844-7905-4f1c-b375-d69317330eae"
+      }
+    }
+  }
+}
