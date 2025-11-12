@@ -12,7 +12,7 @@ interface ThemeContextData {
 
 const ThemeContext = createContext<ThemeContextData>({
     theme: MD3DarkTheme,
-    sourceColor: "#63a002",
+    sourceColor: "#266b29",
     setSourceColor: () => {},
     colorScheme: "dark",
 });

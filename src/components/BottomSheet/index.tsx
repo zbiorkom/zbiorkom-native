@@ -1,5 +1,6 @@
 import { useTheme } from "@/hooks/useTheme";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 
 type Props = {
@@ -8,9 +9,9 @@ type Props = {
 };
 
 export default ({ open, children }: Props) => {
-    const bottomSheetRef = useRef<BottomSheet>(null);
+    const bottomSheetRef = useRef<BottomSheetModal>(null);
     const { theme } = useTheme();
-    console.log(theme.colors.surface)
+    const router = useRouter();
 
     useEffect(() => {
         if (!bottomSheetRef.current) return;
@@ -23,14 +24,16 @@ export default ({ open, children }: Props) => {
     }, [open, bottomSheetRef]);
 
     return (
-        <BottomSheet
+        <BottomSheetModal
             index={open ? 0 : -1}
             ref={bottomSheetRef}
             snapPoints={["50%"]}
             backgroundStyle={{ backgroundColor: theme.colors.background }}
             handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground }}
+            enablePanDownToClose
+            // onClose={enableClosing && router.canGoBack() ? () => router.back() : undefined}
         >
             {children}
-        </BottomSheet>
+        </BottomSheetModal>
     );
 };
