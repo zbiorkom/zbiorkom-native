@@ -1,7 +1,7 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { Stack } from "expo-router";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default () => {
     return (

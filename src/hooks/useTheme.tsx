@@ -2,6 +2,7 @@ import React, { createContext, useState, useMemo, useContext, ReactNode } from "
 import { MD3DarkTheme, MD3LightTheme, MD3Theme, PaperProvider } from "react-native-paper";
 import { LightScheme, DarkScheme } from "material-color-lite";
 import { useColorScheme } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 interface ThemeContextData {
     theme: MD3Theme;
@@ -34,10 +35,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                 secondaryContainer: scheme.secondaryContainer,
                 tertiary: scheme.tertiary,
                 tertiaryContainer: scheme.tertiaryContainer,
-                surface: scheme.surface,
+                surface: scheme.getTone("neutralVariant", colorScheme === "dark" ? 20 : 92),
+                onSurface: scheme.getTone("neutralVariant", colorScheme === "dark" ? 90 : 20),
                 surfaceVariant: scheme.surfaceVariant,
-                background: scheme.getTone("primary", colorScheme === "dark" ? 10 : 97),
-                onBackground: scheme.getTone("primary", colorScheme === "dark" ? 97 : 10),
+                onSurfaceVariant: scheme.onSurfaceVariant,
+                background: scheme.background,
+                onBackground: scheme.onBackground,
                 error: scheme.error,
                 errorContainer: scheme.errorContainer,
                 onPrimary: scheme.onPrimary,
@@ -46,8 +49,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                 onSecondaryContainer: scheme.onSecondaryContainer,
                 onTertiary: scheme.onTertiary,
                 onTertiaryContainer: scheme.onTertiaryContainer,
-                onSurface: scheme.onSurface,
-                onSurfaceVariant: scheme.onSurfaceVariant,
                 onError: scheme.onError,
                 onErrorContainer: scheme.onErrorContainer,
                 outline: scheme.outline,
@@ -79,6 +80,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     return (
         <ThemeContext.Provider value={contextValue}>
             <PaperProvider theme={theme}>{children}</PaperProvider>
+            <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         </ThemeContext.Provider>
     );
 };

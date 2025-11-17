@@ -57,7 +57,7 @@ export const Portal = ({ host, children }: { host: string; children: React.React
 };
 
 export const Host = ({ host }: { host: string }) => {
-    const elements = usePortalStore((state) => state.hosts[host] || []);
+    const elements = usePortalStore(useShallow((state) => state.hosts[host]));
 
-    return elements.map((el) => <Fragment key={el.id}>{el.element}</Fragment>);
+    return elements?.map((el) => <Fragment key={el.id}>{el.element}</Fragment>);
 };

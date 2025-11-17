@@ -17,7 +17,7 @@ export default ({ open, children }: Props) => {
         if (!bottomSheetRef.current) return;
 
         if (open) {
-            bottomSheetRef.current.expand();
+            bottomSheetRef.current.present();
         } else {
             bottomSheetRef.current.close();
         }

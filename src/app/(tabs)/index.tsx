@@ -1,16 +1,11 @@
-import { useLocalSearchParams } from "expo-router";
-import { View } from "react-native";
 import { MapView } from "@maplibre/maplibre-react-native";
-import { StatusBar } from "expo-status-bar";
+import FabButtons from "@/components/Map/FabButtons";
 import { useTheme } from "@/hooks/useTheme";
-import DepartureSheet from "@/components/DepartureSheet";
 import { Host } from "@/hooks/Portal";
+import { View } from "react-native";
 
 export default function Index() {
     const { colorScheme } = useTheme();
-    const { "#": hash } = useLocalSearchParams<{ "#": string }>();
-
-    const isStopSheetOpen = true//hash === "stop";
 
     return (
         <View style={{ flex: 1 }}>
@@ -26,13 +21,9 @@ export default function Index() {
                 attributionEnabled={false}
             >
                 <Host host="map" />
-                {/* <MarkerView coordinate={[21, 52]}>
-                    <Text>Test marker</Text>
-                </MarkerView> */}
             </MapView>
 
-            <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-            <DepartureSheet open={isStopSheetOpen} />
+            <FabButtons />
         </View>
     );
 }

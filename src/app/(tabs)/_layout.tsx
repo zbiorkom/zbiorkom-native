@@ -1,56 +1,46 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import BottomBar from "@/components/ui/BottomBar";
+import { Icon } from "react-native-paper";
 import { Tabs } from "expo-router";
-import { BottomNavigation, Icon } from "react-native-paper";
+import { useTheme } from "@/hooks/useTheme";
 
 export default () => {
+    const { theme } = useTheme();
+
     return (
         <Tabs
             screenOptions={{
                 headerShown: false,
+                sceneStyle: { backgroundColor: theme.colors.background },
             }}
-            tabBar={({ navigation, state, descriptors, insets }) => (
-                <BottomNavigation.Bar
-                    navigationState={state}
-                    safeAreaInsets={insets}
-                    onTabPress={({ route, preventDefault }) => {
-                        if (route.name === "more") {
-                            console.log("More tab pressed");
-                        }
-
-                        const event = navigation.emit({
-                            type: "tabPress",
-                            target: route.key,
-                            canPreventDefault: true,
-                        });
-                        if (event.defaultPrevented) {
-                            preventDefault();
-                        } else {
-                            navigation.navigate(route.name);
-                        }
-                    }}
-                    renderIcon={({ route, focused, color }) => {
-                        const { options } = descriptors[route.key];
-                        return options.tabBarIcon?.({ focused, color, size: 24 });
-                    }}
-                    getLabelText={({ route }) => {
-                        const { options } = descriptors[route.key];
-
-                        return options.title;
-                    }}
-                />
-            )}
+            tabBar={(props) => <BottomBar {...props} />}
         >
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: "Map",
                     tabBarIcon: ({ color }) => <Icon source="map" size={24} color={color} />,
+                }}
+            />
+            <Tabs.Screen
+                name="schedules"
+                options={{
+                    tabBarIcon: ({ color }) => <Icon source="calendar-text" size={24} color={color} />,
+                }}
+            />
+            <Tabs.Screen
+                name="directions"
+                options={{
+                    tabBarIcon: ({ color }) => <Icon source="directions" size={24} color={color} />,
+                }}
+            />
+            <Tabs.Screen
+                name="favorites"
+                options={{
+                    tabBarIcon: ({ color }) => <Icon source="star" size={24} color={color} />,
                 }}
             />
             <Tabs.Screen
                 name="more"
                 options={{
-                    title: "More",
                     tabBarIcon: ({ color }) => <Icon source="dots-horizontal" size={24} color={color} />,
                 }}
             />
