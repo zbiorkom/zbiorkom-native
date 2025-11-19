@@ -1,50 +1,94 @@
 {
-  "expo": {
-    "name": "zbiorkom.live",
-    "slug": "zbiorkom",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "zbiorkom",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "userInterfaceStyle": "automatic",
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/foreground.png",
-        "monochromeImage": "./assets/images/monochrome.png"
-      },
-      "userInterfaceStyle": "automatic",
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "com.zbiorkom.live"
-    },
-    "plugins": [
-      "expo-router",
-      "@maplibre/maplibre-react-native",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#286a2c"
+    "expo": {
+        "name": "zbiorkom.live",
+        "slug": "zbiorkom",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "scheme": "zbiorkom",
+        "ios": {
+            "userInterfaceStyle": "automatic",
+            "supportsTablet": true
+        },
+        "android": {
+            "adaptiveIcon": {
+                "backgroundColor": "#E6F4FE",
+                "foregroundImage": "./assets/images/foreground.png",
+                "monochromeImage": "./assets/images/monochrome.png"
+            },
+            "userInterfaceStyle": "automatic",
+            "edgeToEdgeEnabled": true,
+            "predictiveBackGestureEnabled": false,
+            "package": "com.zbiorkom.live"
+        },
+        "plugins": [
+            "expo-router",
+            "@maplibre/maplibre-react-native",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./assets/images/icon.png",
+                    "imageWidth": 200,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#286a2c"
+                }
+            ],
+            [
+                "expo-font",
+                {
+                    "fonts": [
+                        "./assets/fonts/TIDUI-Light.ttf",
+                        "./assets/fonts/TIDUI-Regular.ttf",
+                        "./assets/fonts/TIDUI-Medium.ttf",
+                        "./assets/fonts/TIDUI-Bold.ttf"
+                    ],
+                    "android": {
+                        "fonts": [
+                            {
+                                "fontFamily": "TIDUI",
+                                "fontDefinitions": [
+                                    {
+                                        "path": "./assets/fonts/TIDUI-Light.ttf",
+                                        "weight": 300
+                                    },
+                                    {
+                                        "path": "./assets/fonts/TIDUI-Regular.ttf",
+                                        "weight": 400
+                                    },
+                                    {
+                                        "path": "./assets/fonts/TIDUI-Medium.ttf",
+                                        "weight": 500
+                                    },
+                                    {
+                                        "path": "./assets/fonts/TIDUI-Bold.ttf",
+                                        "weight": 700
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "ios": {
+                        "fonts": [
+                            "./assets/fonts/TIDUI-Light.ttf",
+                            "./assets/fonts/TIDUI-Regular.ttf",
+                            "./assets/fonts/TIDUI-Medium.ttf",
+                            "./assets/fonts/TIDUI-Bold.ttf"
+                        ]
+                    }
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true,
+            "reactCompiler": true
+        },
+        "extra": {
+            "router": {},
+            "eas": {
+                "projectId": "963b6844-7905-4f1c-b375-d69317330eae"
+            }
         }
-      ]
-    ],
-    "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
-    },
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "963b6844-7905-4f1c-b375-d69317330eae"
-      }
     }
-  }
 }

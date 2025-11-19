@@ -1,172 +1,129 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
+import Reanimated, {
+    Extrapolate,
+    interpolate,
+    useAnimatedStyle,
+    useDerivedValue,
+    useSharedValue,
+    withSpring,
+} from "react-native-reanimated";
+import { LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import * as Haptics from "expo-haptics";
+import React, { useCallback, useState } from "react";
 import { useTheme } from "../../hooks/useTheme";
+import * as Haptics from "expo-haptics";
 
-interface TabLayout {
-    x: number;
-    width: number;
-}
+const BUBBLE_SPRING_CONFIG = {
+    damping: 14,
+    stiffness: 160,
+    mass: 0.6,
+};
+
+const PRESS_SPRING_CONFIG = {
+    damping: 18,
+    stiffness: 220,
+    mass: 0.5,
+};
+
+const MAX_STRETCH_DISTANCE = 8;
+const STRETCH_FACTOR = 0.18;
 
 export default ({ state, descriptors, navigation, insets }: BottomTabBarProps) => {
-    const { theme } = useTheme();
+    const [layouts, setLayouts] = useState<Record<string, { x: number; width: number }>>({});
     const bottomInset = insets.bottom;
-    const [layouts, setLayouts] = useState<Record<string, TabLayout>>({});
-    const [pressedRouteKey, setPressedRouteKey] = useState<string | null>(null);
+    const { theme } = useTheme();
 
-    const animatedLeft = useRef(new Animated.Value(0)).current;
-    const animatedWidth = useRef(new Animated.Value(0)).current;
-    const isFirstRender = useRef(true);
-    const pressLeftExtra = useRef(new Animated.Value(0)).current;
-    const pressWidthExtra = useRef(new Animated.Value(0)).current;
+    const bubbleTranslateX = useSharedValue(0);
+    const bubbleWidth = useSharedValue(0);
+    const pressExtraTranslateX = useSharedValue(0);
+    const pressExtraWidth = useSharedValue(0);
 
-    useEffect(() => {
+    const animatedBubbleStyle = useAnimatedStyle(() => {
         const activeRoute = state.routes[state.index];
-        const layout = layouts[activeRoute?.key ?? ""];
+        const activeLayout = layouts[activeRoute?.key];
 
-        if (!layout) {
-            return;
-        }
+        if (!activeLayout) return {};
 
-        if (isFirstRender.current) {
-            animatedLeft.setValue(layout.x);
-            animatedWidth.setValue(layout.width);
-            isFirstRender.current = false;
-            return;
-        }
+        bubbleTranslateX.value = withSpring(activeLayout.x, BUBBLE_SPRING_CONFIG);
+        bubbleWidth.value = withSpring(activeLayout.width, BUBBLE_SPRING_CONFIG);
 
-        Animated.parallel([
-            Animated.spring(animatedLeft, {
-                toValue: layout.x,
-                useNativeDriver: false,
-                damping: 14,
-                stiffness: 160,
-                mass: 0.6,
-            }),
-            Animated.spring(animatedWidth, {
-                toValue: layout.width,
-                useNativeDriver: false,
-                damping: 14,
-                stiffness: 160,
-                mass: 0.6,
-            }),
-        ]).start();
-    }, [animatedLeft, animatedWidth, layouts, state.index, state.routes]);
+        return {
+            transform: [{ translateX: bubbleTranslateX.value + pressExtraTranslateX.value }],
+            width: bubbleWidth.value + pressExtraWidth.value,
+        };
+    }, [layouts, state.index]);
 
-    useEffect(() => {
-        const activeRoute = state.routes[state.index];
-        const activeLayout = layouts[activeRoute?.key ?? ""];
-        const pressedLayout = pressedRouteKey ? layouts[pressedRouteKey] : undefined;
+    const handleLayout = useCallback(
+        (routeKey: string) => (event: LayoutChangeEvent) => {
+            const { x, width } = event.nativeEvent.layout;
 
-        if (!activeLayout) {
-            Animated.parallel([
-                Animated.spring(pressLeftExtra, {
-                    toValue: 0,
-                    useNativeDriver: false,
-                    damping: 18,
-                    stiffness: 220,
-                    mass: 0.5,
-                }),
-                Animated.spring(pressWidthExtra, {
-                    toValue: 0,
-                    useNativeDriver: false,
-                    damping: 18,
-                    stiffness: 220,
-                    mass: 0.5,
-                }),
-            ]).start();
-            return;
-        }
+            setLayouts((prev) => {
+                const current = prev[routeKey];
+
+                if (current && current.x === x && current.width === width) {
+                    return prev;
+                }
+
+                return { ...prev, [routeKey]: { x, width } };
+            });
+        },
+        []
+    );
+
+    const handlePressIn = (routeKey: string) => () => {
+        const activeRouteKey = state.routes[state.index].key;
+        const activeLayout = layouts[activeRouteKey];
+        const pressedLayout = layouts[routeKey];
+
+        if (!activeLayout || !pressedLayout) return;
 
         let extraLeft = 0;
         let extraWidth = 0;
 
-        if (pressedLayout) {
-            if (pressedRouteKey === activeRoute?.key) {
-                extraWidth = 8;
-            } else {
-                const direction = Math.sign(pressedLayout.x - activeLayout.x);
-                const distance = Math.abs(pressedLayout.x - activeLayout.x);
+        if (routeKey === activeRouteKey) {
+            const isFirst = state.index === 0;
+            const isLast = state.index === state.routes.length - 1;
 
-                extraLeft = direction * Math.min(distance * 0.18, 8);
-                extraWidth = Math.min(distance * 0.36, 8);
+            extraWidth = MAX_STRETCH_DISTANCE;
+
+            if (isLast) {
+                extraLeft = -MAX_STRETCH_DISTANCE;
+            } else if (isFirst) {
+                extraLeft = 0;
+            } else {
+                extraLeft = -(MAX_STRETCH_DISTANCE / 2);
             }
+        } else {
+            const direction = Math.sign(pressedLayout.x - activeLayout.x);
+            const distance = Math.abs(pressedLayout.x - activeLayout.x);
+
+            extraLeft = direction * Math.min(distance * STRETCH_FACTOR, MAX_STRETCH_DISTANCE);
+            extraWidth = Math.min(distance * STRETCH_FACTOR * 2, MAX_STRETCH_DISTANCE);
         }
 
-        Animated.parallel([
-            Animated.spring(pressLeftExtra, {
-                toValue: extraLeft,
-                useNativeDriver: false,
-                damping: 18,
-                stiffness: 220,
-                mass: 0.5,
-            }),
-            Animated.spring(pressWidthExtra, {
-                toValue: extraWidth,
-                useNativeDriver: false,
-                damping: 18,
-                stiffness: 220,
-                mass: 0.5,
-            }),
-        ]).start();
-    }, [layouts, pressLeftExtra, pressWidthExtra, pressedRouteKey, state.index, state.routes]);
-
-    const handleLayout = (routeKey: string) => (event: LayoutChangeEvent) => {
-        const { x, width } = event.nativeEvent.layout;
-
-        setLayouts((prev) => {
-            const current = prev[routeKey];
-            if (current && current.x === x && current.width === width) {
-                return prev;
-            }
-
-            return {
-                ...prev,
-                [routeKey]: { x, width },
-            };
-        });
+        pressExtraTranslateX.value = withSpring(extraLeft, PRESS_SPRING_CONFIG);
+        pressExtraWidth.value = withSpring(extraWidth, PRESS_SPRING_CONFIG);
     };
 
-    const tabItems = useMemo(() => state.routes, [state.routes]);
+    const handlePressOut = () => {
+        pressExtraTranslateX.value = withSpring(0, PRESS_SPRING_CONFIG);
+        pressExtraWidth.value = withSpring(0, PRESS_SPRING_CONFIG);
+    };
 
     return (
         <View pointerEvents="box-none" style={[styles.wrapper, { paddingBottom: bottomInset + 4 }]}>
-            <View
-                style={[
-                    styles.container,
-                    {
-                        backgroundColor: theme.colors.surface,
-                    },
-                ]}
-            >
-                <Animated.View
+            <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
+                <Reanimated.View
                     pointerEvents="none"
-                    style={[
-                        styles.bubble,
-                        {
-                            backgroundColor: theme.colors.primary,
-                            transform: [
-                                {
-                                    translateX: Animated.add(animatedLeft, pressLeftExtra),
-                                },
-                            ],
-                            width: Animated.add(animatedWidth, pressWidthExtra),
-                        },
-                    ]}
+                    style={[styles.bubble, { backgroundColor: theme.colors.primary }, animatedBubbleStyle]}
                 />
 
-                {tabItems.map((route, index) => {
+                {state.routes.map((route, index) => {
                     const isFocused = state.index === index;
                     const { options } = descriptors[route.key];
-
                     const color = isFocused ? theme.colors.onPrimary : theme.colors.onSurface;
-
                     const icon = options.tabBarIcon?.({ focused: isFocused, color, size: 24 });
 
                     const onPress = () => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
                         const event = navigation.emit({
                             type: "tabPress",
                             target: route.key,
@@ -176,6 +133,8 @@ export default ({ state, descriptors, navigation, insets }: BottomTabBarProps) =
                         if (!isFocused && !event.defaultPrevented) {
                             navigation.navigate(route.name, route.params);
                         }
+
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     };
 
                     return (
@@ -186,8 +145,8 @@ export default ({ state, descriptors, navigation, insets }: BottomTabBarProps) =
                             accessibilityLabel={options.tabBarAccessibilityLabel}
                             style={styles.tabItem}
                             onPress={onPress}
-                            onPressIn={() => setPressedRouteKey(route.key)}
-                            onPressOut={() => setPressedRouteKey(null)}
+                            onPressIn={handlePressIn(route.key)}
+                            onPressOut={handlePressOut}
                             onLayout={handleLayout(route.key)}
                         >
                             <View style={styles.content}>{icon}</View>

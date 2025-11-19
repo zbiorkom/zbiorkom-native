@@ -1,5 +1,5 @@
 import React, { createContext, useState, useMemo, useContext, ReactNode } from "react";
-import { MD3DarkTheme, MD3LightTheme, MD3Theme, PaperProvider } from "react-native-paper";
+import { configureFonts, MD3DarkTheme, MD3LightTheme, MD3Theme, PaperProvider } from "react-native-paper";
 import { LightScheme, DarkScheme } from "material-color-lite";
 import { useColorScheme } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -64,6 +64,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                 backdrop: defaultTheme.colors.backdrop,
                 elevation: defaultTheme.colors.elevation,
             },
+            fonts: configureFonts({
+                config: { fontFamily: "TIDUI" },
+                isV3: true,
+            }),
         };
     }, [sourceColor, colorScheme]);
 

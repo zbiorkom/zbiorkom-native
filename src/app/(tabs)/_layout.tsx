@@ -11,6 +11,7 @@ export default () => {
             screenOptions={{
                 headerShown: false,
                 sceneStyle: { backgroundColor: theme.colors.background },
+                // animation: "shift"
             }}
             tabBar={(props) => <BottomBar {...props} />}
         >
