@@ -134,7 +134,7 @@ export default ({ state, descriptors, navigation, insets }: BottomTabBarProps) =
                             navigation.navigate(route.name, route.params);
                         }
 
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                     };
 
                     return (

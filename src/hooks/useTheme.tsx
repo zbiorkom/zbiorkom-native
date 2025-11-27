@@ -62,7 +62,15 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                 surfaceDisabled: defaultTheme.colors.surfaceDisabled,
                 onSurfaceDisabled: defaultTheme.colors.onSurfaceDisabled,
                 backdrop: defaultTheme.colors.backdrop,
-                elevation: defaultTheme.colors.elevation,
+
+                elevation: {
+                    level0: scheme.getTone("neutralVariant", colorScheme === "dark" ? 6 : 100),
+                    level1: scheme.getTone("neutralVariant", colorScheme === "dark" ? 12 : 95),
+                    level2: scheme.getTone("neutralVariant", colorScheme === "dark" ? 18 : 90),
+                    level3: scheme.getTone("neutralVariant", colorScheme === "dark" ? 24 : 85),
+                    level4: scheme.getTone("neutralVariant", colorScheme === "dark" ? 30 : 80),
+                    level5: scheme.getTone("neutralVariant", colorScheme === "dark" ? 36 : 75),
+                },
             },
             fonts: configureFonts({
                 config: { fontFamily: "TIDUI" },

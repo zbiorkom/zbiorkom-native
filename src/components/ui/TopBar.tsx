@@ -1,11 +1,9 @@
 import { StyleSheet, View, LayoutChangeEvent, ViewStyle, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, IconButton } from "react-native-paper";
-import { scheduleOnRN } from "react-native-worklets";
-import React, { ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import { useTheme } from "../../hooks/useTheme";
 import { useRouter } from "expo-router";
-import * as Haptics from "expo-haptics";
 import Animated, {
     interpolate,
     Extrapolation,
@@ -23,15 +21,25 @@ type TopBarOptions = {
     showBackButton?: boolean;
     rightComponent?: React.ReactNode;
     addBottomPadding?: boolean;
+    stickyComponent?: React.ReactNode;
+    hideLargeTitle?: boolean;
 };
 
 const topBarHeight = 50;
 
-export const useTopBar = ({ title, showBackButton, rightComponent, addBottomPadding }: TopBarOptions) => {
+export const useTopBar = ({
+    title,
+    showBackButton,
+    rightComponent,
+    addBottomPadding,
+    stickyComponent,
+    hideLargeTitle,
+}: TopBarOptions) => {
     const [measuredHeaderHeight, setMeasuredHeaderHeight] = useState(0);
     const scrollRef = useAnimatedRef<Animated.ScrollView>();
     const { height: windowHeight } = useWindowDimensions();
     const insets = useSafeAreaInsets();
+    const { theme } = useTheme();
 
     const headerHeight = useSharedValue(0);
     const direction = useSharedValue(0);
@@ -52,22 +60,24 @@ export const useTopBar = ({ title, showBackButton, rightComponent, addBottomPadd
                 scrollY.value = currentY;
             },
             onEndDrag: (event) => {
+                if (hideLargeTitle) return;
+
                 const height = headerHeight.value;
                 const y = event.contentOffset.y;
 
                 if (height > 0 && y > 0 && y < height) {
-                    if (Math.abs(event.velocity?.y ?? 0) < 100) {
-                        scheduleOnRN(Haptics.impactAsync, Haptics.ImpactFeedbackStyle.Light);
+                    if (Math.abs(event.velocity?.y ?? 0) < 1) {
                         scrollTo(scrollRef, 0, direction.value === 1 ? height : 0, true);
                     }
                 }
             },
             onMomentumEnd: (event) => {
+                if (hideLargeTitle) return;
+
                 const height = headerHeight.value;
                 const y = event.contentOffset.y;
 
                 if (height > 0 && y > 0 && y < height) {
-                    scheduleOnRN(Haptics.impactAsync, Haptics.ImpactFeedbackStyle.Light);
                     scrollTo(scrollRef, 0, direction.value === 1 ? height : 0, true);
                 }
             },
@@ -81,29 +91,50 @@ export const useTopBar = ({ title, showBackButton, rightComponent, addBottomPadd
                     rightComponent={rightComponent}
                     scrollY={scrollY}
                     headerHeight={headerHeight}
+                    hideLargeTitle={hideLargeTitle}
                 />
 
                 <Animated.ScrollView
                     ref={scrollRef}
                     onScroll={scrollHandler}
                     scrollEventThrottle={16}
+                    stickyHeaderIndices={stickyComponent ? [1] : undefined}
                     contentContainerStyle={[
                         {
                             paddingTop: topBarHeight + insets.top,
                             minHeight: windowHeight + measuredHeaderHeight,
-                            paddingBottom: insets.bottom + (addBottomPadding ? 72 : 0),
+                            paddingBottom: insets.bottom + (addBottomPadding ? 64 : 0),
                         },
                         style,
                     ]}
                 >
-                    <LargeHeader
-                        title={title}
-                        onLayout={(e) => {
-                            const height = e.nativeEvent.layout.height;
-                            headerHeight.value = height;
-                            setMeasuredHeaderHeight(height);
-                        }}
-                    />
+                    {!hideLargeTitle && (
+                        <View style={{ zIndex: 20 }}>
+                            <LargeHeader
+                                title={title}
+                                onLayout={(e) => {
+                                    const height = e.nativeEvent.layout.height;
+                                    headerHeight.value = height;
+                                    setMeasuredHeaderHeight(height);
+                                }}
+                            />
+                        </View>
+                    )}
+
+                    {hideLargeTitle && <View style={{ height: 16 }} />}
+
+                    {stickyComponent && (
+                        <View
+                            style={{
+                                paddingTop: topBarHeight + insets.top,
+                                marginTop: -(topBarHeight + insets.top),
+                                backgroundColor: theme.colors.background,
+                                zIndex: 10,
+                            }}
+                        >
+                            {stickyComponent}
+                        </View>
+                    )}
 
                     {children}
                 </Animated.ScrollView>
@@ -137,9 +168,17 @@ type TopBarProps = {
     rightComponent?: React.ReactNode;
     scrollY: SharedValue<number>;
     headerHeight?: SharedValue<number>;
+    hideLargeTitle?: boolean;
 };
 
-const TopBar = ({ title, showBackButton = false, rightComponent, scrollY, headerHeight }: TopBarProps) => {
+const TopBar = ({
+    title,
+    showBackButton,
+    rightComponent,
+    scrollY,
+    headerHeight,
+    hideLargeTitle,
+}: TopBarProps) => {
     const insets = useSafeAreaInsets();
     const { theme } = useTheme();
     const router = useRouter();
@@ -148,6 +187,16 @@ const TopBar = ({ title, showBackButton = false, rightComponent, scrollY, header
     const heightToUse = headerHeight || defaultHeaderHeight;
 
     const containerStyle = useAnimatedStyle(() => {
+        if (hideLargeTitle) {
+            const backgroundColor = interpolateColor(
+                scrollY.value,
+                [0, 30],
+                [theme.colors.background, theme.colors.surface]
+            );
+
+            return { backgroundColor };
+        }
+
         const targetHeight = heightToUse.value;
 
         const backgroundColor = interpolateColor(
@@ -160,6 +209,10 @@ const TopBar = ({ title, showBackButton = false, rightComponent, scrollY, header
     });
 
     const titleStyle = useAnimatedStyle(() => {
+        if (hideLargeTitle) {
+            return { opacity: 1, transform: [{ translateY: 0 }] };
+        }
+
         const targetHeight = heightToUse.value;
 
         const opacity = interpolate(
@@ -180,38 +233,36 @@ const TopBar = ({ title, showBackButton = false, rightComponent, scrollY, header
     });
 
     return (
-        <Animated.View
-            style={[
-                styles.container,
-                { paddingTop: insets.top, height: topBarHeight + insets.top },
-                containerStyle,
-            ]}
-        >
-            <View style={styles.content}>
-                <View style={styles.leftContainer}>
-                    {showBackButton && (
-                        <IconButton
-                            icon="arrow-left"
-                            size={20}
-                            onPress={() => router.back()}
-                            iconColor={theme.colors.onSurface}
-                        />
-                    )}
+        <View style={[styles.container, { pointerEvents: "box-none" }]}>
+            <Animated.View
+                style={[{ paddingTop: insets.top, height: topBarHeight + insets.top }, containerStyle]}
+            >
+                <View style={[styles.content, { height: topBarHeight }]}>
+                    <View style={styles.leftContainer}>
+                        {showBackButton && (
+                            <IconButton
+                                icon="arrow-left"
+                                size={20}
+                                onPress={() => router.back()}
+                                iconColor={theme.colors.onSurface}
+                            />
+                        )}
 
-                    <Animated.View style={[styles.titleContainer, titleStyle]}>
-                        <Text
-                            variant="titleMedium"
-                            numberOfLines={1}
-                            style={{ color: theme.colors.onSurface }}
-                        >
-                            {title}
-                        </Text>
-                    </Animated.View>
+                        <Animated.View style={[styles.titleContainer, titleStyle]}>
+                            <Text
+                                variant="titleMedium"
+                                numberOfLines={1}
+                                style={{ color: theme.colors.onSurface }}
+                            >
+                                {title}
+                            </Text>
+                        </Animated.View>
+                    </View>
+
+                    <View style={styles.rightContainer}>{rightComponent}</View>
                 </View>
-
-                <View style={styles.rightContainer}>{rightComponent}</View>
-            </View>
-        </Animated.View>
+            </Animated.View>
+        </View>
     );
 };
 

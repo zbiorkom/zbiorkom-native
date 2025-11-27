@@ -1,12 +1,16 @@
 import { useTopBar } from "@/components/ui/TopBar";
-import { IconButton, Text } from "react-native-paper";
+import { Button, IconButton, Text } from "react-native-paper";
 
 export default function MyScreen() {
     const { Container } = useTopBar({
         title: "Mój Tytułeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
         rightComponent: <IconButton icon="dots-vertical" onPress={() => {}} />,
-        showBackButton: true,
         addBottomPadding: true,
+        stickyComponent: <>
+            <Button mode="contained" style={{ margin: 16 }}>
+                Przycisk w sticky
+            </Button>
+        </>,
     });
 
     return (
