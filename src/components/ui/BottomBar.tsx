@@ -1,15 +1,8 @@
-import Reanimated, {
-    Extrapolate,
-    interpolate,
-    useAnimatedStyle,
-    useDerivedValue,
-    useSharedValue,
-    withSpring,
-} from "react-native-reanimated";
+import Reanimated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useCallback, useState } from "react";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "@/hooks/useTheme";
 import * as Haptics from "expo-haptics";
 
 const BUBBLE_SPRING_CONFIG = {
@@ -114,14 +107,21 @@ export default ({ state, descriptors, navigation, insets }: BottomTabBarProps) =
             <View style={[styles.container, { backgroundColor: theme.colors.surface }]}>
                 <Reanimated.View
                     pointerEvents="none"
-                    style={[styles.bubble, { backgroundColor: theme.colors.primary }, animatedBubbleStyle]}
+                    style={[
+                        styles.bubble,
+                        { backgroundColor: theme.colors.secondaryContainer },
+                        animatedBubbleStyle,
+                    ]}
                 />
 
                 {state.routes.map((route, index) => {
                     const isFocused = state.index === index;
                     const { options } = descriptors[route.key];
-                    const color = isFocused ? theme.colors.onPrimary : theme.colors.onSurface;
-                    const icon = options.tabBarIcon?.({ focused: isFocused, color, size: 24 });
+                    const icon = options.tabBarIcon?.({
+                        focused: isFocused,
+                        color: isFocused ? theme.colors.onSecondaryContainer : theme.colors.onSurfaceVariant,
+                        size: 24,
+                    });
 
                     const onPress = () => {
                         const event = navigation.emit({

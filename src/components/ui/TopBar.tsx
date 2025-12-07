@@ -215,6 +215,10 @@ const TopBar = ({
 
         const targetHeight = heightToUse.value;
 
+        if (targetHeight === 0) {
+            return { opacity: 0, transform: [{ translateY: 10 }] };
+        }
+
         const opacity = interpolate(
             scrollY.value,
             [targetHeight - 20, targetHeight],

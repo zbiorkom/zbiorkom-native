@@ -11,15 +11,17 @@ interface ThemeContextData {
     colorScheme: "light" | "dark";
 }
 
+const defaultColor = "#266b29";
+
 const ThemeContext = createContext<ThemeContextData>({
     theme: MD3DarkTheme,
-    sourceColor: "#266b29",
+    sourceColor: defaultColor,
     setSourceColor: () => {},
     colorScheme: "dark",
 });
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    const [sourceColor, setSourceColor] = useState<string>("#266b29");
+    const [sourceColor, setSourceColor] = useState<string>(defaultColor);
     const colorScheme = useColorScheme() ?? "dark";
 
     const theme = useMemo(() => {
@@ -35,8 +37,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                 secondaryContainer: scheme.secondaryContainer,
                 tertiary: scheme.tertiary,
                 tertiaryContainer: scheme.tertiaryContainer,
-                surface: scheme.getTone("neutralVariant", colorScheme === "dark" ? 20 : 92),
-                onSurface: scheme.getTone("neutralVariant", colorScheme === "dark" ? 90 : 20),
+                surface: scheme.getTone("neutral", colorScheme === "dark" ? 20 : 95),
+                onSurface: scheme.getTone("neutral", colorScheme === "dark" ? 95 : 20),
                 surfaceVariant: scheme.surfaceVariant,
                 onSurfaceVariant: scheme.onSurfaceVariant,
                 background: scheme.background,
