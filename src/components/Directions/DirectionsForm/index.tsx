@@ -1,7 +1,7 @@
 import { Button, IconButton, Surface } from "react-native-paper";
 import { StyleSheet, View } from "react-native";
 import DirectionsFormPlace from "./DirectionsFormPlace";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "~/hooks/useTheme";
 
 export default () => {
     const { theme } = useTheme();

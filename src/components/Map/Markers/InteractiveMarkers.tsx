@@ -1,6 +1,6 @@
 import { CircleLayer, ShapeSource, SymbolLayer } from "@maplibre/maplibre-react-native";
-import { Stop, Vehicle } from "@/tools/protobufTypings";
-import { locationPrecision } from "@/tools";
+import { Stop, Vehicle } from "~/tools/protobufTypings";
+import { locationPrecision } from "~/tools/constants";
 import { useMemo } from "react";
 
 type Props = {
@@ -64,13 +64,7 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
     }, [vehicles, stops]);
 
     return (
-        <ShapeSource
-            id="interactive-markers"
-            shape={geojsonData}
-            onPress={(e) => {
-                console.log(e.features);
-            }}
-        >
+        <ShapeSource id="interactive-markers" shape={geojsonData}>
             <CircleLayer
                 id="stops"
                 style={{

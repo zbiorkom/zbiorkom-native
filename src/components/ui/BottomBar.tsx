@@ -2,7 +2,7 @@ import Reanimated, { useAnimatedStyle, useSharedValue, withSpring } from "react-
 import { LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useCallback, useState } from "react";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "~/hooks/useTheme";
 import * as Haptics from "expo-haptics";
 
 const BUBBLE_SPRING_CONFIG = {

@@ -1,5 +1,5 @@
-import { useAgencies } from "@/hooks/useBackend";
-import { VehicleType } from "@/tools/typings";
+import { useAgencies } from "~/hooks/useBackend";
+import { VehicleType } from "~/tools/typings";
 import { SvgXml } from "react-native-svg";
 
 export const defaultColors: Record<number, string> = {

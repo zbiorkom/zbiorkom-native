@@ -1,5 +1,5 @@
-import DirectionsForm from "@/components/Directions/DirectionsForm";
-import { useTopBar } from "@/components/ui/TopBar";
+import DirectionsForm from "@/Directions/DirectionsForm";
+import { useTopBar } from "@/ui/TopBar";
 import { Button, Text } from "react-native-paper";
 
 export default () => {

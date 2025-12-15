@@ -4,7 +4,7 @@ import { StyleSheet, Text } from "react-native";
 import { Button, Searchbar } from "react-native-paper";
 import { useEffect, useState } from "react";
 import { MarkerView } from "@maplibre/maplibre-react-native";
-import { Portal } from "@/hooks/Portal";
+import { Portal } from "~/hooks/Portal";
 
 export default ({ open }: { open: boolean }) => {
     const [departures, setDepartures] = useState<string>("");

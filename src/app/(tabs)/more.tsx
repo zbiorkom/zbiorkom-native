@@ -1,5 +1,5 @@
-import { useTopBar } from "@/components/ui/TopBar";
-import useSettings from "@/hooks/useSettings";
+import { useTopBar } from "@/ui/TopBar";
+import useSettings from "~/hooks/useSettings";
 import { View } from "react-native";
 import { Switch } from "react-native-gesture-handler";
 import { Button, IconButton, Text } from "react-native-paper";

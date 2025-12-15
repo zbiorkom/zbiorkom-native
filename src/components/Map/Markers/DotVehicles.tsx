@@ -1,6 +1,6 @@
 import { CircleLayer, ShapeSource } from "@maplibre/maplibre-react-native";
-import { DotVehicles } from "@/tools/protobufTypings";
-import { locationPrecision } from "@/tools";
+import { DotVehicles } from "~/tools/protobufTypings";
+import { locationPrecision } from "~/tools/constants";
 import { useMemo } from "react";
 
 export default ({ vehicles: { colors, vehicles } }: { vehicles: DotVehicles }) => {

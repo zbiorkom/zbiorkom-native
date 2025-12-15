@@ -1,5 +1,5 @@
 import { Text, TouchableRipple } from "react-native-paper";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "~/hooks/useTheme";
 import { StyleSheet, View } from "react-native";
 
 export default () => {

@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { AppState, AppStateStatus } from "react-native";
 import decompress from "brotli/decompress";
-import { apiBase } from "@/tools";
 import {
     ClientMessage,
     ServerMessage,
@@ -12,7 +11,8 @@ import {
     SubscribeStopDepartures,
     SubscribeTripUpdate,
     Error,
-} from "@/tools/protobufTypings";
+} from "~/tools/protobufTypings";
+import { apiBase } from "~/tools/constants";
 
 const pingInterval = 10000;
 const unsubscribeDebounce = 100;
@@ -92,6 +92,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         ws.onopen = () => {
             setStatus(ConnectionStatus.CONNECTED);
+            console.log("WebSocket connected");
             startPing();
         };
 

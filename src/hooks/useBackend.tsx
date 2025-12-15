@@ -3,9 +3,9 @@ import { useMMKVObject, useMMKVString } from "react-native-mmkv";
 import * as SplashScreen from "expo-splash-screen";
 import { Button, Text } from "react-native-paper";
 import { View, StyleSheet } from "react-native";
-import { Agency, City } from "@/tools/typings";
+import { Agency, City } from "~/tools/typings";
 import { useTheme } from "./useTheme";
-import { apiBase } from "@/tools";
+import { apiBase } from "~/tools/constants";
 
 type CitiesResponse = {
     hash: string;

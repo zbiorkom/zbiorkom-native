@@ -3,7 +3,9 @@
     "compilerOptions": {
         "strict": true,
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/components/*"],
+            "~/hooks/*": ["./src/hooks/*"],
+            "~/tools/*": ["./src/tools/*"]
         }
     },
     "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]

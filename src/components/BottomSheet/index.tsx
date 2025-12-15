@@ -1,17 +1,17 @@
-import { useTheme } from "@/hooks/useTheme";
-import BottomSheet, { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useRouter } from "expo-router";
+import { useTheme } from "~/hooks/useTheme";
+import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useEffect, useRef } from "react";
+import { BackHandler } from "react-native";
 
 type Props = {
     open: boolean;
     children: React.ReactNode;
+    onClose?: () => void;
 };
 
-export default ({ open, children }: Props) => {
+export default ({ open, children, onClose }: Props) => {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const { theme } = useTheme();
-    const router = useRouter();
 
     useEffect(() => {
         if (!bottomSheetRef.current) return;
@@ -23,15 +23,30 @@ export default ({ open, children }: Props) => {
         }
     }, [open, bottomSheetRef]);
 
+    useEffect(() => {
+        if (!open) return;
+
+        const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+            bottomSheetRef.current?.close();
+            onClose?.();
+
+            return true;
+        });
+
+        return () => sub.remove();
+    }, [open, bottomSheetRef, onClose]);
+
     return (
         <BottomSheetModal
             index={open ? 0 : -1}
             ref={bottomSheetRef}
-            snapPoints={["50%"]}
-            backgroundStyle={{ backgroundColor: theme.colors.background }}
-            handleIndicatorStyle={{ backgroundColor: theme.colors.onBackground }}
+            backgroundStyle={{ backgroundColor: theme.colors.surface }}
+            handleIndicatorStyle={{ backgroundColor: theme.colors.onSurfaceVariant }}
             enablePanDownToClose
-            // onClose={enableClosing && router.canGoBack() ? () => router.back() : undefined}
+            backdropComponent={(props) => (
+                <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />
+            )}
+            onDismiss={onClose}
         >
             {children}
         </BottomSheetModal>

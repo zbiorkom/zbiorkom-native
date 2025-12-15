@@ -10,22 +10,22 @@ import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 export const protobufPackage = "zbiorkom.socket";
 
 export enum StopTimeType {
-  Regular = 0,
-  Forbidden = 1,
-  OnDemand = 3,
+  REGULAR = 0,
+  FORBIDDEN = 1,
+  ON_DEMAND = 2,
 }
 
 export function stopTimeTypeFromJSON(object: any): StopTimeType {
   switch (object) {
     case 0:
-    case "Regular":
-      return StopTimeType.Regular;
+    case "REGULAR":
+      return StopTimeType.REGULAR;
     case 1:
-    case "Forbidden":
-      return StopTimeType.Forbidden;
-    case 3:
-    case "OnDemand":
-      return StopTimeType.OnDemand;
+    case "FORBIDDEN":
+      return StopTimeType.FORBIDDEN;
+    case 2:
+    case "ON_DEMAND":
+      return StopTimeType.ON_DEMAND;
     default:
       throw new globalThis.Error("Unrecognized enum value " + object + " for enum StopTimeType");
   }
@@ -33,42 +33,47 @@ export function stopTimeTypeFromJSON(object: any): StopTimeType {
 
 export function stopTimeTypeToJSON(object: StopTimeType): string {
   switch (object) {
-    case StopTimeType.Regular:
-      return "Regular";
-    case StopTimeType.Forbidden:
-      return "Forbidden";
-    case StopTimeType.OnDemand:
-      return "OnDemand";
+    case StopTimeType.REGULAR:
+      return "REGULAR";
+    case StopTimeType.FORBIDDEN:
+      return "FORBIDDEN";
+    case StopTimeType.ON_DEMAND:
+      return "ON_DEMAND";
     default:
       throw new globalThis.Error("Unrecognized enum value " + object + " for enum StopTimeType");
   }
 }
 
 export enum DepartureStatus {
-  /** Scheduled - Based on static GTFS data */
-  Scheduled = 0,
-  /** Live - Real-time prediction available */
-  Live = 1,
-  /** Departed - Vehicle has already left this stop */
-  Departed = 2,
-  /** Cancelled - Trip is cancelled */
-  Cancelled = 3,
+  /** SCHEDULED - Based on static GTFS data */
+  SCHEDULED = 0,
+  /** LIVE - Real-time prediction available */
+  LIVE = 1,
+  /** ON_PREVIOUS_TRIP - Vehicle is still on the previous trip */
+  ON_PREVIOUS_TRIP = 2,
+  /** DEPARTED - Vehicle has already left this stop */
+  DEPARTED = 3,
+  /** CANCELLED - Trip is cancelled */
+  CANCELLED = 4,
 }
 
 export function departureStatusFromJSON(object: any): DepartureStatus {
   switch (object) {
     case 0:
-    case "Scheduled":
-      return DepartureStatus.Scheduled;
+    case "SCHEDULED":
+      return DepartureStatus.SCHEDULED;
     case 1:
-    case "Live":
-      return DepartureStatus.Live;
+    case "LIVE":
+      return DepartureStatus.LIVE;
     case 2:
-    case "Departed":
-      return DepartureStatus.Departed;
+    case "ON_PREVIOUS_TRIP":
+      return DepartureStatus.ON_PREVIOUS_TRIP;
     case 3:
-    case "Cancelled":
-      return DepartureStatus.Cancelled;
+    case "DEPARTED":
+      return DepartureStatus.DEPARTED;
+    case 4:
+    case "CANCELLED":
+      return DepartureStatus.CANCELLED;
     default:
       throw new globalThis.Error("Unrecognized enum value " + object + " for enum DepartureStatus");
   }
@@ -76,14 +81,16 @@ export function departureStatusFromJSON(object: any): DepartureStatus {
 
 export function departureStatusToJSON(object: DepartureStatus): string {
   switch (object) {
-    case DepartureStatus.Scheduled:
-      return "Scheduled";
-    case DepartureStatus.Live:
-      return "Live";
-    case DepartureStatus.Departed:
-      return "Departed";
-    case DepartureStatus.Cancelled:
-      return "Cancelled";
+    case DepartureStatus.SCHEDULED:
+      return "SCHEDULED";
+    case DepartureStatus.LIVE:
+      return "LIVE";
+    case DepartureStatus.ON_PREVIOUS_TRIP:
+      return "ON_PREVIOUS_TRIP";
+    case DepartureStatus.DEPARTED:
+      return "DEPARTED";
+    case DepartureStatus.CANCELLED:
+      return "CANCELLED";
     default:
       throw new globalThis.Error("Unrecognized enum value " + object + " for enum DepartureStatus");
   }
@@ -131,7 +138,7 @@ export interface ServerMessage {
 
 export interface Error {
   code: string;
-  message: string;
+  message?: string | undefined;
 }
 
 export interface Bounds {
@@ -149,6 +156,11 @@ export interface Route {
   type: number;
   color: string;
   longName?: string | undefined;
+  directions: string[];
+}
+
+export interface Routes {
+  routes: Route[];
 }
 
 export interface Stop {
@@ -174,7 +186,7 @@ export interface Vehicle {
   id: string;
   city: string;
   route: Route | undefined;
-  brigade: string;
+  brigade?: string | undefined;
   tripId?: string | undefined;
   location: number[];
   bearing?: number | undefined;
@@ -799,7 +811,7 @@ export const ServerMessage: MessageFns<ServerMessage> = {
       TripUpdateData.encode(message.tripUpdateData, writer.uint32(26).fork()).join();
     }
     if (message.error !== undefined) {
-      Error.encode(message.error, writer.uint32(794).fork()).join();
+      Error.encode(message.error, writer.uint32(34).fork()).join();
     }
     return writer;
   },
@@ -835,8 +847,8 @@ export const ServerMessage: MessageFns<ServerMessage> = {
           message.tripUpdateData = TripUpdateData.decode(reader, reader.uint32());
           continue;
         }
-        case 99: {
-          if (tag !== 794) {
+        case 4: {
+          if (tag !== 34) {
             break;
           }
 
@@ -902,7 +914,7 @@ export const ServerMessage: MessageFns<ServerMessage> = {
 };
 
 function createBaseError(): Error {
-  return { code: "", message: "" };
+  return { code: "", message: undefined };
 }
 
 export const Error: MessageFns<Error> = {
@@ -910,7 +922,7 @@ export const Error: MessageFns<Error> = {
     if (message.code !== "") {
       writer.uint32(10).string(message.code);
     }
-    if (message.message !== "") {
+    if (message.message !== undefined) {
       writer.uint32(18).string(message.message);
     }
     return writer;
@@ -951,7 +963,7 @@ export const Error: MessageFns<Error> = {
   fromJSON(object: any): Error {
     return {
       code: isSet(object.code) ? globalThis.String(object.code) : "",
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : undefined,
     };
   },
 
@@ -960,7 +972,7 @@ export const Error: MessageFns<Error> = {
     if (message.code !== "") {
       obj.code = message.code;
     }
-    if (message.message !== "") {
+    if (message.message !== undefined) {
       obj.message = message.message;
     }
     return obj;
@@ -972,7 +984,7 @@ export const Error: MessageFns<Error> = {
   fromPartial<I extends Exact<DeepPartial<Error>, I>>(object: I): Error {
     const message = createBaseError();
     message.code = object.code ?? "";
-    message.message = object.message ?? "";
+    message.message = object.message ?? undefined;
     return message;
   },
 };
@@ -1086,7 +1098,7 @@ export const Bounds: MessageFns<Bounds> = {
 };
 
 function createBaseRoute(): Route {
-  return { id: "", city: "", name: "", agency: undefined, type: 0, color: "", longName: undefined };
+  return { id: "", city: "", name: "", agency: undefined, type: 0, color: "", longName: undefined, directions: [] };
 }
 
 export const Route: MessageFns<Route> = {
@@ -1111,6 +1123,9 @@ export const Route: MessageFns<Route> = {
     }
     if (message.longName !== undefined) {
       writer.uint32(58).string(message.longName);
+    }
+    for (const v of message.directions) {
+      writer.uint32(66).string(v!);
     }
     return writer;
   },
@@ -1178,6 +1193,14 @@ export const Route: MessageFns<Route> = {
           message.longName = reader.string();
           continue;
         }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.directions.push(reader.string());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1196,6 +1219,9 @@ export const Route: MessageFns<Route> = {
       type: isSet(object.type) ? globalThis.Number(object.type) : 0,
       color: isSet(object.color) ? globalThis.String(object.color) : "",
       longName: isSet(object.longName) ? globalThis.String(object.longName) : undefined,
+      directions: globalThis.Array.isArray(object?.directions)
+        ? object.directions.map((e: any) => globalThis.String(e))
+        : [],
     };
   },
 
@@ -1222,6 +1248,9 @@ export const Route: MessageFns<Route> = {
     if (message.longName !== undefined) {
       obj.longName = message.longName;
     }
+    if (message.directions?.length) {
+      obj.directions = message.directions;
+    }
     return obj;
   },
 
@@ -1237,6 +1266,65 @@ export const Route: MessageFns<Route> = {
     message.type = object.type ?? 0;
     message.color = object.color ?? "";
     message.longName = object.longName ?? undefined;
+    message.directions = object.directions?.map((e) => e) || [];
+    return message;
+  },
+};
+
+function createBaseRoutes(): Routes {
+  return { routes: [] };
+}
+
+export const Routes: MessageFns<Routes> = {
+  encode(message: Routes, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.routes) {
+      Route.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Routes {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoutes();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.routes.push(Route.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Routes {
+    return { routes: globalThis.Array.isArray(object?.routes) ? object.routes.map((e: any) => Route.fromJSON(e)) : [] };
+  },
+
+  toJSON(message: Routes): unknown {
+    const obj: any = {};
+    if (message.routes?.length) {
+      obj.routes = message.routes.map((e) => Route.toJSON(e));
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Routes>, I>>(base?: I): Routes {
+    return Routes.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Routes>, I>>(object: I): Routes {
+    const message = createBaseRoutes();
+    message.routes = object.routes?.map((e) => Route.fromPartial(e)) || [];
     return message;
   },
 };
@@ -1590,7 +1678,7 @@ function createBaseVehicle(): Vehicle {
     id: "",
     city: "",
     route: undefined,
-    brigade: "",
+    brigade: undefined,
     tripId: undefined,
     location: [],
     bearing: undefined,
@@ -1609,7 +1697,7 @@ export const Vehicle: MessageFns<Vehicle> = {
     if (message.route !== undefined) {
       Route.encode(message.route, writer.uint32(26).fork()).join();
     }
-    if (message.brigade !== "") {
+    if (message.brigade !== undefined) {
       writer.uint32(34).string(message.brigade);
     }
     if (message.tripId !== undefined) {
@@ -1724,7 +1812,7 @@ export const Vehicle: MessageFns<Vehicle> = {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       city: isSet(object.city) ? globalThis.String(object.city) : "",
       route: isSet(object.route) ? Route.fromJSON(object.route) : undefined,
-      brigade: isSet(object.brigade) ? globalThis.String(object.brigade) : "",
+      brigade: isSet(object.brigade) ? globalThis.String(object.brigade) : undefined,
       tripId: isSet(object.tripId) ? globalThis.String(object.tripId) : undefined,
       location: globalThis.Array.isArray(object?.location) ? object.location.map((e: any) => globalThis.Number(e)) : [],
       bearing: isSet(object.bearing) ? globalThis.Number(object.bearing) : undefined,
@@ -1743,7 +1831,7 @@ export const Vehicle: MessageFns<Vehicle> = {
     if (message.route !== undefined) {
       obj.route = Route.toJSON(message.route);
     }
-    if (message.brigade !== "") {
+    if (message.brigade !== undefined) {
       obj.brigade = message.brigade;
     }
     if (message.tripId !== undefined) {
@@ -1769,7 +1857,7 @@ export const Vehicle: MessageFns<Vehicle> = {
     message.id = object.id ?? "";
     message.city = object.city ?? "";
     message.route = (object.route !== undefined && object.route !== null) ? Route.fromPartial(object.route) : undefined;
-    message.brigade = object.brigade ?? "";
+    message.brigade = object.brigade ?? undefined;
     message.tripId = object.tripId ?? undefined;
     message.location = object.location?.map((e) => e) || [];
     message.bearing = object.bearing ?? undefined;

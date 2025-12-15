@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Bounds } from "@/tools/protobufTypings";
+import { Bounds } from "~/tools/protobufTypings";
 
 interface MapViewState {
     bounds: Bounds | null;
