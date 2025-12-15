@@ -1,0 +1,107 @@
+import BottomSheet from "@/BottomSheet";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { StyleSheet, View } from "react-native";
+import { List, TouchableRipple } from "react-native-paper";
+import { useShallow } from "zustand/shallow";
+import useMapSheets from "~/hooks/useMapSheets";
+import VehicleMarker from "../Markers/VehicleMarker";
+import StopMarker from "../Markers/StopMarker";
+import { useTheme } from "~/hooks/useTheme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { darkFilter } from "~/tools/constants";
+import useSettings from "~/hooks/useSettings";
+
+export default ({ open }: { open: boolean }) => {
+    const { showBrigade, showFleet, useStopCode } = useSettings();
+    const { theme, colorScheme } = useTheme();
+    const { bottom } = useSafeAreaInsets();
+    const [markersClicked, setStop, goBack] = useMapSheets(
+        useShallow((state) => [state.markersClicked, state.setStop, state.goBack])
+    );
+
+    return (
+        <BottomSheet open={open} backdrop onClose={goBack}>
+            <BottomSheetScrollView>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        gap: 8,
+                        padding: 8,
+                        paddingBottom: bottom + 8,
+                    }}
+                >
+                    {markersClicked?.map((marker, index) => {
+                        if (marker.vehicle) {
+                            return (
+                                <TouchableRipple
+                                    key={`marker-clicked-ripple-${index}`}
+                                    borderless
+                                    onPress={() => console.log("Pressed vehicle marker ripple")}
+                                    style={[
+                                        styles.button,
+                                        styles.vehicleButton,
+                                        { backgroundColor: theme.colors.elevation.level3 },
+                                    ]}
+                                >
+                                    <VehicleMarker
+                                        vehicle={marker.vehicle!}
+                                        showBrigade={showBrigade}
+                                        showFleet={showFleet}
+                                        style={colorScheme === "dark" ? { filter: darkFilter } : {}}
+                                    />
+                                </TouchableRipple>
+                            );
+                        } else if (marker.stop) {
+                            return (
+                                <TouchableRipple
+                                    key={`marker-clicked-ripple-${index}`}
+                                    borderless
+                                    onPress={() => setStop(marker.stop!)}
+                                    style={[
+                                        styles.button,
+                                        styles.stopButton,
+                                        { backgroundColor: theme.colors.elevation.level3 },
+                                    ]}
+                                >
+                                    <List.Item
+                                        left={({ style }) => (
+                                            <StopMarker
+                                                stop={marker.stop!}
+                                                useStopCode={useStopCode}
+                                                style={[
+                                                    style,
+                                                    colorScheme === "dark" ? { filter: darkFilter } : {},
+                                                ]}
+                                            />
+                                        )}
+                                        title={`${marker.stop.name} ${marker.stop.code || ""}`}
+                                        description={`➜ ${marker.stop.direction}`}
+                                        descriptionNumberOfLines={1}
+                                        style={{ paddingVertical: 0 }}
+                                    />
+                                </TouchableRipple>
+                            );
+                        }
+                    })}
+                </View>
+            </BottomSheetScrollView>
+        </BottomSheet>
+    );
+};
+
+const styles = StyleSheet.create({
+    button: {
+        flexGrow: 1,
+        flexBasis: "45%",
+        borderRadius: 16,
+    },
+    stopButton: {
+        flexBasis: "100%",
+    },
+    vehicleButton: {
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 16,
+    },
+});

@@ -1,15 +1,21 @@
-import { useTheme } from "~/hooks/useTheme";
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
-import { useEffect, useRef } from "react";
+import { useTheme } from "~/hooks/useTheme";
 import { BackHandler } from "react-native";
+import { useEffect, useRef } from "react";
+import BottomSheetHeader, { BottomSheetHeaderActions } from "./BottomSheetHeader";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
     open: boolean;
+    backdrop?: boolean;
+    headerLeftComponent?: React.ReactNode;
+    headerActions?: BottomSheetHeaderActions;
     children: React.ReactNode;
     onClose?: () => void;
 };
 
-export default ({ open, children, onClose }: Props) => {
+export default ({ open, backdrop, headerLeftComponent, headerActions, children, onClose }: Props) => {
+    const { bottom } = useSafeAreaInsets();
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const { theme } = useTheme();
 
@@ -28,7 +34,6 @@ export default ({ open, children, onClose }: Props) => {
 
         const sub = BackHandler.addEventListener("hardwareBackPress", () => {
             bottomSheetRef.current?.close();
-            onClose?.();
 
             return true;
         });
@@ -38,17 +43,20 @@ export default ({ open, children, onClose }: Props) => {
 
     return (
         <BottomSheetModal
-            index={open ? 0 : -1}
+            index={0}
             ref={bottomSheetRef}
             backgroundStyle={{ backgroundColor: theme.colors.surface }}
             handleIndicatorStyle={{ backgroundColor: theme.colors.onSurfaceVariant }}
-            enablePanDownToClose
-            backdropComponent={(props) => (
-                <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />
+            handleComponent={() => (
+                <BottomSheetHeader leftComponent={headerLeftComponent} actions={headerActions} />
             )}
+            backdropComponent={
+                backdrop
+                    ? (props) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />
+                    : undefined
+            }
             onDismiss={onClose}
-        >
-            {children}
-        </BottomSheetModal>
+            children={children}
+        />
     );
 };

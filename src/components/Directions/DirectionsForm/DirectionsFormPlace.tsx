@@ -10,7 +10,6 @@ export default () => {
             onPress={() => console.log("Pressed")}
             borderless
             style={[styles.container, { backgroundColor: theme.colors.elevation.level2 }]}
-            rippleColor={theme.colors.onSurfaceVariant + "33"}
         >
             <View>
                 <Text variant="bodyMedium">Liceum nr 1</Text>

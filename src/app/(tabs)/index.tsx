@@ -13,7 +13,9 @@ import Map from "@/Map";
 const pixelRatio = Platform.OS === "android" ? PixelRatio.get() : 1;
 
 export default () => {
-    const setMarkersClicked = useMapSheets(useShallow((state) => state.setMarkersClicked));
+    const [setMarkersClicked, setStop] = useMapSheets(
+        useShallow((state) => [state.setMarkersClicked, state.setStop])
+    );
     const { colorScheme } = useTheme();
     const mapRef = useRef<MapViewRef>(null);
     const setMapView = useMapView((state) => state.setView);
@@ -44,7 +46,7 @@ export default () => {
                     ["vehicles", "stops"]
                 );
 
-                if (!features) return;
+                if (!features?.features.length) return;
 
                 if (features.features.length > 1) {
                     const data: MarkersClicked = [];
@@ -59,6 +61,12 @@ export default () => {
 
                     setMarkersClicked(data);
                 } else {
+                    const { properties } = features.features[0];
+
+                    if (properties?.type === "vehicle") {
+                    } else if (properties?.type === "stop") {
+                        setStop(properties.stop);
+                    }
                 }
             }}
         >

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import { Vehicle } from "~/tools/protobufTypings";
 import { Icon, Text } from "react-native-paper";
 import { halfTransparentText } from "~/tools/constants";
@@ -9,15 +9,16 @@ type Props = {
     vehicle: Vehicle;
     showBrigade?: boolean;
     showFleet?: boolean;
+    style?: StyleProp<ViewStyle>;
 };
 
-export default ({ vehicle, showBrigade, showFleet }: Props) => {
+export default ({ vehicle, showBrigade, showFleet, style }: Props) => {
     const fleetId = vehicle.id.includes("/") ? vehicle.id.split("/")[1] : vehicle.id;
 
     return (
         <View
             collapsable={false}
-            style={[styles.vehicleContainer, { backgroundColor: vehicle.route?.color }]}
+            style={[styles.vehicleContainer, { backgroundColor: vehicle.route?.color }, style]}
         >
             <>
                 {vehicle.bearing !== undefined && (
