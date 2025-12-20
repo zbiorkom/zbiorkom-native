@@ -1,4 +1,4 @@
-import { MapView, MapViewRef, MarkerView } from "@maplibre/maplibre-react-native";
+import { Camera, MapView, MapViewRef } from "@maplibre/maplibre-react-native";
 import { useTheme } from "~/hooks/useTheme";
 import { Host } from "~/hooks/Portal";
 import { PixelRatio, Platform, View } from "react-native";
@@ -9,6 +9,7 @@ import { useShallow } from "zustand/shallow";
 import { darkFilter } from "~/tools/constants";
 import mapStyle from "@/Map/mapStyle.json";
 import Map from "@/Map";
+import { useCity } from "~/hooks/useBackend";
 
 const pixelRatio = Platform.OS === "android" ? PixelRatio.get() : 1;
 
@@ -16,9 +17,10 @@ export default () => {
     const [setMarkersClicked, setStop] = useMapSheets(
         useShallow((state) => [state.setMarkersClicked, state.setStop])
     );
+    const [city] = useCity();
     const { colorScheme } = useTheme();
     const mapRef = useRef<MapViewRef>(null);
-    const setMapView = useMapView((state) => state.setView);
+    const [setMapView, setCameraRef] = useMapView(useShallow((state) => [state.setView, state.setCameraRef]));
     const touchStart = useRef<{ x: number; y: number }>(null);
 
     return (
@@ -75,7 +77,7 @@ export default () => {
                     flex: 1,
                     filter: colorScheme === "dark" ? darkFilter : undefined,
                 }}
-                mapStyle={mapStyle}
+                mapStyle={Object.assign(mapStyle, { center: city?.location, zoom: 15 })}
                 attributionEnabled={false}
                 onRegionDidChange={({ properties }) => {
                     setMapView({
@@ -97,7 +99,7 @@ export default () => {
                 pitchEnabled={false}
             >
                 <Host host="map" />
-                <MarkerView coordinate={[0, 0]} children={<></>} />
+                <Camera ref={setCameraRef} />
             </MapView>
 
             <Map />

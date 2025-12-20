@@ -1,7 +1,7 @@
 import { CircleLayer, ShapeSource, SymbolLayer } from "@maplibre/maplibre-react-native";
 import { Stop, Vehicle } from "~/tools/protobufTypings";
-import { locationPrecision } from "~/tools/constants";
 import { useMemo } from "react";
+import { normalizeLocation } from "~/tools/constants";
 
 type Props = {
     vehicles: Vehicle[];
@@ -15,9 +15,6 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
         const features: GeoJSON.Feature[] = [];
 
         for (const vehicle of vehicles) {
-            const lon = vehicle.location[0] / locationPrecision;
-            const lat = vehicle.location[1] / locationPrecision;
-
             const fleetId = vehicle.id.split("/")[1];
 
             const size =
@@ -30,7 +27,7 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
                 type: "Feature",
                 geometry: {
                     type: "Point",
-                    coordinates: [lon, lat],
+                    coordinates: normalizeLocation(vehicle.location),
                 },
                 properties: {
                     type: "vehicle",
@@ -41,14 +38,11 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
         }
 
         for (const stop of stops) {
-            const lon = stop.location[0] / locationPrecision;
-            const lat = stop.location[1] / locationPrecision;
-
             features.push({
                 type: "Feature",
                 geometry: {
                     type: "Point",
-                    coordinates: [lon, lat],
+                    coordinates: normalizeLocation(stop.location),
                 },
                 properties: {
                     type: "stop",

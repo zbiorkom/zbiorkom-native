@@ -8,22 +8,24 @@ import InteractiveMarkers from "./InteractiveMarkers";
 import useSettings from "~/hooks/useSettings";
 import StopMarker from "./StopMarker";
 import { MarkerView } from "@maplibre/maplibre-react-native";
-import { locationPrecision } from "~/tools/constants";
 import AnimatedMarker from "./AnimatedMarker";
+import { useCity } from "~/hooks/useBackend";
+import { normalizeLocation } from "~/tools/constants";
 
 export default () => {
     const [bounds, zoom] = useMapView(useShallow((state) => [state.bounds!, state.zoom!]));
     const { showBrigade, showFleet, useStopCode } = useSettings();
+    const [city] = useCity();
 
     const { data } = useWebsocketSubscription("subscribeMapFeatures", {
         options: {
-            city: "warsaw",
+            city: city?.id || "",
             bounds,
             zoom,
             filterRoutes: [],
             filterModels: [],
         },
-        disabled: !bounds || !zoom,
+        disabled: !bounds || !zoom || !city,
         mergeHandler: (prevData, newData) => {
             if (newData.stopsChanged) return newData;
 
@@ -40,7 +42,7 @@ export default () => {
         <Portal host="map">
             {data.stops.map((stop) => (
                 <MarkerView
-                    coordinate={[stop.location[0] / locationPrecision, stop.location[1] / locationPrecision]}
+                    coordinate={normalizeLocation(stop.location)}
                     key={stop.id}
                 >
                     <StopMarker stop={stop} useStopCode={useStopCode} />
@@ -49,10 +51,7 @@ export default () => {
 
             {data.vehicles.map((vehicle) => (
                 <AnimatedMarker
-                    coordinate={[
-                        vehicle.location[0] / locationPrecision,
-                        vehicle.location[1] / locationPrecision,
-                    ]}
+                    coordinate={normalizeLocation(vehicle.location)}
                     key={vehicle.id}
                 >
                     <VehicleMarker vehicle={vehicle} showBrigade={showBrigade} showFleet={showFleet} />

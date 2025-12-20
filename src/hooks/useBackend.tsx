@@ -53,6 +53,8 @@ export const BackendProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     setCurrentCity(undefined);
                 }
             }
+
+            setHasError(false);
         } else {
             setHasError(true);
         }

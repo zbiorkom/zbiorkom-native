@@ -3,7 +3,6 @@ import { useTheme } from "~/hooks/useTheme";
 import { BackHandler } from "react-native";
 import { useEffect, useRef } from "react";
 import BottomSheetHeader, { BottomSheetHeaderActions } from "./BottomSheetHeader";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
     open: boolean;
@@ -15,7 +14,6 @@ type Props = {
 };
 
 export default ({ open, backdrop, headerLeftComponent, headerActions, children, onClose }: Props) => {
-    const { bottom } = useSafeAreaInsets();
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const { theme } = useTheme();
 
