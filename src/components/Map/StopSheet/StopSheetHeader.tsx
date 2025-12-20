@@ -4,7 +4,7 @@ import { Text } from "react-native-paper";
 import Svg, { G, Path } from "react-native-svg";
 import { useTheme } from "~/hooks/useTheme";
 import { darkFilter } from "~/tools/constants";
-import { Stop } from "~/tools/protobufTypings";
+import { Stop } from "~/tools/compactTypings";
 
 export default ({ stop }: { stop: Stop }) => {
     const { colorScheme } = useTheme();

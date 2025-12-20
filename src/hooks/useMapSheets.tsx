@@ -1,4 +1,4 @@
-import { Stop, Vehicle } from "~/tools/protobufTypings";
+import { Stop, Vehicle } from "~/tools/compactTypings";
 import { create } from "zustand";
 
 export type MarkersClicked = { vehicle?: Vehicle; stop?: Stop }[];

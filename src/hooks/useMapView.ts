@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Bounds } from "~/tools/protobufTypings";
+import { Bounds } from "~/tools/compactTypings";
 import { CameraRef } from "@maplibre/maplibre-react-native";
 
 interface MapViewState {

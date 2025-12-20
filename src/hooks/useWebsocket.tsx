@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { AppState, AppStateStatus } from "react-native";
-import decompress from "brotli/decompress";
+import { CompactDeserializer } from "~/tools/compact";
 import {
     ClientMessage,
     ServerMessage,
@@ -10,8 +10,8 @@ import {
     SubscribeMapFeatures,
     SubscribeStopDepartures,
     SubscribeTripUpdate,
-    Error,
-} from "~/tools/protobufTypings";
+    ErrorMessage,
+} from "~/tools/compactTypings";
 import { apiBase } from "~/tools/constants";
 
 const pingInterval = 10000;
@@ -100,8 +100,8 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             if (event.data === "pong") return;
 
             if (event.data instanceof ArrayBuffer) {
-                const decompressed = decompress(new Uint8Array(event.data) as any);
-                const msg = ServerMessage.decode(decompressed);
+                const deserializer = new CompactDeserializer(event.data);
+                const msg = deserializer.unpack(ServerMessage) as ServerMessage;
 
                 if (msg) setLastMessage(msg);
             }
@@ -159,7 +159,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
                 connect();
             } else {
-                socketRef.current?.send(ClientMessage.encode(message).finish());
+                socketRef.current?.send(JSON.stringify(message));
             }
         },
         [connect]
@@ -179,7 +179,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                     stopPing();
 
                     if (socketRef.current?.readyState === WebSocket.OPEN) {
-                        socketRef.current.send(ClientMessage.encode({ unsubscribe: {} }).finish());
+                        socketRef.current.send(JSON.stringify({ unsubscribe: {} }));
                     }
                 }
             }, unsubscribeDebounce);
@@ -232,7 +232,7 @@ export const useWebsocketSubscription = <K extends keyof SubscriptionMap>(
     const { status, lastMessage, subscribe, unsubscribe } = useContext(WebSocketContext)!;
 
     const [data, setData] = useState<SubscriptionMap[K]["dataType"] | null>(null);
-    const [error, setError] = useState<Error | null>(null);
+    const [error, setError] = useState<ErrorMessage | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const subscriptionId = useRef(Math.random().toString(36).substr(2, 9)).current;

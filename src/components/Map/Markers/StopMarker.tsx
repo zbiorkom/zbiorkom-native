@@ -1,6 +1,6 @@
 import Svg, { G, Path, Text } from "react-native-svg";
 import RouteIcon, { defaultColors } from "@/ui/RouteIcon";
-import { Stop } from "~/tools/protobufTypings";
+import { Stop } from "~/tools/compactTypings";
 import { StyleProp, View, ViewStyle } from "react-native";
 import React from "react";
 

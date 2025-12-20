@@ -1,5 +1,5 @@
 import { CircleLayer, ShapeSource, SymbolLayer } from "@maplibre/maplibre-react-native";
-import { Stop, Vehicle } from "~/tools/protobufTypings";
+import { Stop, Vehicle } from "~/tools/compactTypings";
 import { useMemo } from "react";
 import { normalizeLocation } from "~/tools/constants";
 

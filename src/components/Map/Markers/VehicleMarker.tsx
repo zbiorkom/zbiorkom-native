@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
-import { Vehicle } from "~/tools/protobufTypings";
+import { Vehicle } from "~/tools/compactTypings";
 import { Icon, Text } from "react-native-paper";
 import { halfTransparentText } from "~/tools/constants";
 import RouteIcon from "@/ui/RouteIcon";
