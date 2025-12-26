@@ -54,6 +54,10 @@ export default ({ open, backdrop, headerLeftComponent, headerActions, children, 
                     : undefined
             }
             onDismiss={onClose}
+            onAnimate={(fromIndex, toIndex) => {
+                if (fromIndex === 0 && toIndex === -1) {
+                }
+            }}
             children={children}
         />
     );
