@@ -1,7 +1,7 @@
-import { Stop, Vehicle } from "~/tools/compactTypings";
 import { create } from "zustand";
+import { Stop, VehicleType } from "~/tools/typings";
 
-export type MarkersClicked = { vehicle?: Vehicle; stop?: Stop }[];
+export type MarkersClicked = { vehicle?: VehicleType; stop?: Stop }[];
 export type SheetType = "MarkersClicked" | "Stop";
 
 interface MapSheetsState {

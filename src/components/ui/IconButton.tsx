@@ -10,21 +10,18 @@ type Props = {
 };
 
 export default ({ icon, onPress, square }: Props) => {
-    const [isPressed, setIsPressed] = useState(false);
     const { theme } = useTheme();
 
     return (
         <TouchableRipple
             style={{
                 backgroundColor: theme.colors.secondaryContainer,
-                borderRadius: isPressed ? 12 : 24,
+                borderRadius: 24,
                 paddingHorizontal: square ? 12 : 6,
                 paddingVertical: 12,
             }}
             borderless
             onPress={onPress}
-            onPressIn={() => setIsPressed(true)}
-            onPressOut={() => setIsPressed(false)}
         >
             <Icon source={icon} size={22} color={theme.colors.onSecondaryContainer} />
         </TouchableRipple>

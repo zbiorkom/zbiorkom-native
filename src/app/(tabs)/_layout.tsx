@@ -1,17 +1,13 @@
 import BottomBar from "@/ui/BottomBar";
 import { Icon } from "react-native-paper";
 import { Tabs } from "expo-router";
-import { useTheme } from "~/hooks/useTheme";
 
 export default () => {
-    const { theme } = useTheme();
-
     return (
         <Tabs
             screenOptions={{
                 headerShown: false,
-                sceneStyle: { backgroundColor: theme.colors.background },
-                // animation: "shift"
+                animation: "shift"
             }}
             tabBar={(props) => <BottomBar {...props} />}
         >

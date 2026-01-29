@@ -8,7 +8,6 @@ import Animated, {
     interpolate,
     Extrapolation,
     useAnimatedStyle,
-    interpolateColor,
     SharedValue,
     useSharedValue,
     useAnimatedScrollHandler,
@@ -42,44 +41,36 @@ export const useTopBar = ({
     const { theme } = useTheme();
 
     const headerHeight = useSharedValue(0);
-    const direction = useSharedValue(0);
     const scrollY = useSharedValue(0);
+    const isDragging = useSharedValue(false);
 
     const Container = ({ children, style }: { children: ReactNode; style?: ViewStyle }) => {
+        const snap = (y: number, velocity: number = 0) => {
+            "worklet";
+            if (hideLargeTitle) return;
+
+            const height = headerHeight.value;
+            if (height > 0 && y > 0 && y < height) {
+                if (Math.abs(velocity) < 100) {
+                    scrollTo(scrollRef, 0, y > height / 2 ? height : 0, true);
+                }
+            }
+        };
+
         const scrollHandler = useAnimatedScrollHandler({
             onScroll: (event) => {
-                const currentY = event.contentOffset.y;
-                const diff = currentY - scrollY.value;
-
-                if (diff > 0) {
-                    direction.value = 1;
-                } else if (diff < 0) {
-                    direction.value = -1;
-                }
-
-                scrollY.value = currentY;
+                scrollY.value = event.contentOffset.y;
+            },
+            onBeginDrag: () => {
+                isDragging.value = true;
             },
             onEndDrag: (event) => {
-                if (hideLargeTitle) return;
-
-                const height = headerHeight.value;
-                const y = event.contentOffset.y;
-
-                if (height > 0 && y > 0 && y < height) {
-                    if (Math.abs(event.velocity?.y ?? 0) < 1) {
-                        scrollTo(scrollRef, 0, direction.value === 1 ? height : 0, true);
-                    }
-                }
+                isDragging.value = false;
+                snap(event.contentOffset.y, event.velocity?.y);
             },
             onMomentumEnd: (event) => {
-                if (hideLargeTitle) return;
-
-                const height = headerHeight.value;
-                const y = event.contentOffset.y;
-
-                if (height > 0 && y > 0 && y < height) {
-                    scrollTo(scrollRef, 0, direction.value === 1 ? height : 0, true);
-                }
+                if (isDragging.value) return;
+                snap(event.contentOffset.y, 0);
             },
         });
 
@@ -107,6 +98,7 @@ export const useTopBar = ({
                         },
                         style,
                     ]}
+                    showsVerticalScrollIndicator={false}
                 >
                     {!hideLargeTitle && (
                         <View style={{ zIndex: 20 }}>
@@ -155,7 +147,7 @@ const LargeHeader = ({ title, onLayout }: LargeHeaderProps) => {
 
     return (
         <View style={styles.largeHeaderContainer} onLayout={onLayout}>
-            <Text variant="titleLarge" style={{ color: theme.colors.onBackground }}>
+            <Text variant="displaySmall" style={{ color: theme.colors.onBackground }}>
                 {title}
             </Text>
         </View>
@@ -188,52 +180,31 @@ const TopBar = ({
 
     const containerStyle = useAnimatedStyle(() => {
         if (hideLargeTitle) {
-            const backgroundColor = interpolateColor(
-                scrollY.value,
-                [0, 30],
-                [theme.colors.background, theme.colors.surface]
-            );
-
-            return { backgroundColor };
+            return { backgroundColor: theme.colors.background };
         }
 
-        const targetHeight = heightToUse.value;
-
-        const backgroundColor = interpolateColor(
-            scrollY.value,
-            [targetHeight / 2, targetHeight],
-            [theme.colors.background, theme.colors.surface]
-        );
-
-        return { backgroundColor };
+        return { backgroundColor: theme.colors.background };
     });
 
     const titleStyle = useAnimatedStyle(() => {
         if (hideLargeTitle) {
-            return { opacity: 1, transform: [{ translateY: 0 }] };
+            return { opacity: 1 };
         }
 
         const targetHeight = heightToUse.value;
 
         if (targetHeight === 0) {
-            return { opacity: 0, transform: [{ translateY: 10 }] };
+            return { opacity: 0 };
         }
 
         const opacity = interpolate(
             scrollY.value,
             [targetHeight - 20, targetHeight],
             [0, 1],
-            Extrapolation.CLAMP
+            Extrapolation.CLAMP,
         );
 
-        const translateY = interpolate(
-            scrollY.value,
-            [targetHeight - 20, targetHeight],
-            [10, 0],
-            Extrapolation.CLAMP
-        );
-
-        return { opacity, transform: [{ translateY }] };
+        return { opacity };
     });
 
     return (
@@ -256,7 +227,7 @@ const TopBar = ({
                             <Text
                                 variant="titleMedium"
                                 numberOfLines={1}
-                                style={{ color: theme.colors.onSurface }}
+                                style={{ color: theme.colors.onSurface, fontWeight: "600" }}
                             >
                                 {title}
                             </Text>
@@ -301,7 +272,7 @@ const styles = StyleSheet.create({
     largeHeaderContainer: {
         paddingHorizontal: 16,
         paddingBottom: 16,
-        paddingTop: 8,
+        paddingTop: 60,
     },
 });
 

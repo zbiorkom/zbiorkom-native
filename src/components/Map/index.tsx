@@ -1,4 +1,4 @@
-import Markers from "./Markers";
+// import Markers from "./Markers";
 import FabButtons from "./FabButtons";
 import useMapSheets from "~/hooks/useMapSheets";
 import { useShallow } from "zustand/shallow";
@@ -12,7 +12,7 @@ export default () => {
         <>
             {(!openSheet || openSheet === "MarkersClicked") && (
                 <>
-                    <Markers />
+                    {/* <Markers /> */}
                     <FabButtons />
                 </>
             )}

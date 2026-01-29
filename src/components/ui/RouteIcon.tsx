@@ -28,11 +28,11 @@ type Props = {
 };
 
 export default ({ type, agency, color, size }: Props) => {
-    const agencies = useAgencies();
+    const agencies = useAgencies(); // fix: only shows agencies from selected city
 
     return (
         <SvgXml
-            xml={"<svg>" + (agencies[agency!]?.svgIcon || typeIcons[type]) + "</svg>"}
+            xml={"<svg>" + (agencies[agency!]?.icon || typeIcons[type]) + "</svg>"}
             viewBox="0 0 24 24"
             width={size}
             height={size}

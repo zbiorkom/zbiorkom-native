@@ -10,13 +10,14 @@ import { useTheme } from "~/hooks/useTheme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { darkFilter } from "~/tools/constants";
 import useSettings from "~/hooks/useSettings";
+import { EStop } from "~/tools/typings";
 
 export default ({ open }: { open: boolean }) => {
     const { showBrigade, showFleet, useStopCode } = useSettings();
     const { theme, colorScheme } = useTheme();
     const { bottom } = useSafeAreaInsets();
     const [markersClicked, setStop, goBack] = useMapSheets(
-        useShallow((state) => [state.markersClicked, state.setStop, state.goBack])
+        useShallow((state) => [state.markersClicked, state.setStop, state.goBack]),
     );
 
     return (
@@ -75,8 +76,8 @@ export default ({ open }: { open: boolean }) => {
                                                 ]}
                                             />
                                         )}
-                                        title={`${marker.stop.name} ${marker.stop.code || ""}`}
-                                        description={`➜ ${marker.stop.direction}`}
+                                        title={`${marker.stop[EStop.name]} ${marker.stop[EStop.code] || ""}`}
+                                        description={`➜ ${marker.stop[EStop.direction]}`}
                                         descriptionNumberOfLines={1}
                                         style={{ paddingVertical: 0 }}
                                     />

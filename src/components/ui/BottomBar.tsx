@@ -3,7 +3,6 @@ import { LayoutChangeEvent, Pressable, StyleSheet, View } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import React, { useCallback, useState } from "react";
 import { useTheme } from "~/hooks/useTheme";
-import * as Haptics from "expo-haptics";
 
 const BUBBLE_SPRING_CONFIG = {
     damping: 14,
@@ -59,7 +58,7 @@ export default ({ state, descriptors, navigation, insets }: BottomTabBarProps) =
                 return { ...prev, [routeKey]: { x, width } };
             });
         },
-        []
+        [],
     );
 
     const handlePressIn = (routeKey: string) => () => {
@@ -133,8 +132,6 @@ export default ({ state, descriptors, navigation, insets }: BottomTabBarProps) =
                         if (!isFocused && !event.defaultPrevented) {
                             navigation.navigate(route.name, route.params);
                         }
-
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                     };
 
                     return (

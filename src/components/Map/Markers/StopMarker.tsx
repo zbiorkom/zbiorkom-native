@@ -1,8 +1,8 @@
 import Svg, { G, Path, Text } from "react-native-svg";
 import RouteIcon, { defaultColors } from "@/ui/RouteIcon";
-import { Stop } from "~/tools/compactTypings";
 import { StyleProp, View, ViewStyle } from "react-native";
 import React from "react";
+import { EStop, Stop, VehicleType } from "~/tools/typings";
 
 type Props = {
     stop: Stop;
@@ -10,12 +10,14 @@ type Props = {
     style?: StyleProp<ViewStyle>;
 };
 
-export default ({ stop, useStopCode, style }: Props) => {
-    const showStopCode = useStopCode && stop.code && stop.code.length <= 2;
-    const color = defaultColors[stop.type[0]];
-    const bearing = (stop.bearing || 0) + 45;
+const stationTypes = [VehicleType.Ferry, VehicleType.Train, VehicleType.Subway];
 
-    if (stop.station) {
+export default ({ stop, useStopCode, style }: Props) => {
+    const showStopCode = useStopCode && stop[EStop.code] && stop[EStop.code].length <= 2;
+    const color = defaultColors[stop[EStop.vehicleTypes][0]];
+    const bearing = (stop[EStop.bearing] || 0) + 45;
+
+    if (stop[EStop.vehicleTypes].some((type) => stationTypes.includes(type))) {
         return (
             <View pointerEvents="none" style={[{ alignSelf: "center" }, style]}>
                 <Svg width={40} height={40} viewBox="0 0 40 40">
@@ -25,7 +27,11 @@ export default ({ stop, useStopCode, style }: Props) => {
                     />
 
                     <G fill="hsla(0, 0%, 100%, 0.8)" transform="translate(8, 8)">
-                        <RouteIcon type={stop.type[0]} color="hsla(0, 0%, 100%, 0.8)" size={24} />
+                        <RouteIcon
+                            type={stop[EStop.vehicleTypes][0]}
+                            color="hsla(0, 0%, 100%, 0.8)"
+                            size={24}
+                        />
                     </G>
                 </Svg>
             </View>
@@ -61,10 +67,14 @@ export default ({ stop, useStopCode, style }: Props) => {
                             alignmentBaseline="middle"
                             fontFamily="TIDUI"
                         >
-                            {stop.code}
+                            {stop[EStop.code]}
                         </Text>
                     ) : (
-                        <RouteIcon type={stop.type[0]} color="hsla(0, 0%, 100%, 0.8)" size={22} />
+                        <RouteIcon
+                            type={stop[EStop.vehicleTypes][0]}
+                            color="hsla(0, 0%, 100%, 0.8)"
+                            size={22}
+                        />
                     )}
                 </G>
             </Svg>

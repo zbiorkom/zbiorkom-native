@@ -1,16 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { useMMKVObject, useMMKVString } from "react-native-mmkv";
 import * as SplashScreen from "expo-splash-screen";
 import { Button, Text } from "react-native-paper";
 import { View, StyleSheet } from "react-native";
 import { Agency, City } from "~/tools/typings";
 import { useTheme } from "./useTheme";
 import { apiBase } from "~/tools/constants";
-
-type CitiesResponse = {
-    hash: string;
-    cities?: City[];
-};
+import { useSettingsStore, CitiesResponse } from "./useSettings";
 
 type BackendContextValue = {
     cities: City[];
@@ -34,8 +29,12 @@ const fetchCities = async (previousHash?: string) => {
 };
 
 export const BackendProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [cities, setCities] = useMMKVObject<CitiesResponse>("cities");
-    const [currentCity, setCurrentCity] = useMMKVString("city");
+    const cities = useSettingsStore((state) => state.citiesResponse);
+    const setCities = useSettingsStore((state) => state.setCitiesResponse);
+    
+    const currentCity = useSettingsStore((state) => state.currentCity);
+    const setCurrentCity = useSettingsStore((state) => state.setCurrentCity);
+    
     const { theme } = useTheme();
 
     const [isReady, setIsReady] = useState(false);
@@ -70,14 +69,17 @@ export const BackendProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const agencies = useMemo(() => {
         const result: Record<string, Agency> = {};
 
-        for (const city of cities?.cities || []) {
-            for (const [agencyId, agency] of Object.entries(city.agencies)) {
-                result[agencyId] = agency;
-            }
+        if (!currentCity) return result;
+
+        const city = (cities?.cities || []).find((c) => c.id === currentCity);
+        if (!city) return result;
+
+        for (const [agencyId, agency] of Object.entries(city.agencies || {})) {
+            result[agencyId] = agency;
         }
 
         return result;
-    }, [cities?.cities]);
+    }, [cities?.cities, currentCity]);
 
     const contextValue = useMemo(
         () => ({ cities: cities?.cities || [], currentCity: currentCity, setCurrentCity, agencies }),
@@ -133,7 +135,7 @@ export const useCity = () => {
         [context.cities, context.currentCity]
     );
 
-    return [currentCity, context.setCurrentCity] as const;
+    return [currentCity!, context.setCurrentCity] as const;
 };
 
 export const useAgencies = () => {

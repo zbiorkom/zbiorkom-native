@@ -11,7 +11,7 @@ import StopSheetHeader from "./StopSheetHeader";
 import { normalizeLocation } from "~/tools/constants";
 import { useEffect } from "react";
 import { useMapNavigate } from "~/hooks/useMapView";
-import { useWebsocketSubscription } from "~/hooks/useWebsocket";
+import { EStop } from "~/tools/typings";
 
 export default ({ open }: { open: boolean }) => {
     const [stop, goBack] = useMapSheets(useShallow((state) => [state.stop, state.goBack]));
@@ -21,24 +21,8 @@ export default ({ open }: { open: boolean }) => {
     useEffect(() => {
         if (!open || !stop) return;
 
-        navigateTo(normalizeLocation(stop.location), 16);
+        navigateTo(normalizeLocation(stop[EStop.location]), 16);
     }, [open, stop]);
-
-    const { data } = useWebsocketSubscription("subscribeStopDepartures", {
-        options:
-            stop && open
-                ? {
-                      city: stop.city,
-                      stopId: stop.id,
-                      limit: 20,
-                      time: Date.now(),
-                      destinations: [],
-                  }
-                : undefined,
-        disabled: !stop || !open,
-    });
-
-    console.log(data);
 
     if (!stop) return null;
 
@@ -72,7 +56,7 @@ export default ({ open }: { open: boolean }) => {
 
             {open && (
                 <Portal host="map">
-                    <MarkerView coordinate={normalizeLocation(stop.location)} key={stop.id}>
+                    <MarkerView coordinate={normalizeLocation(stop[EStop.location])} key={stop[EStop.id]}>
                         <StopMarker stop={stop} useStopCode={useStopCode} />
                     </MarkerView>
                 </Portal>

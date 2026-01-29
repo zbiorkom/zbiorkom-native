@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { Bounds } from "~/tools/compactTypings";
 import { CameraRef } from "@maplibre/maplibre-react-native";
+import { Bounds } from "~/tools/typings";
 
 interface MapViewState {
     cameraRef: CameraRef | null;
@@ -20,7 +20,7 @@ const useMapView = create<MapViewState>((set, get) => ({
     zoom: null,
     setView: ({ bounds: [[minLon, minLat], [maxLon, maxLat]], zoom }) => {
         set(() => ({
-            bounds: { minLon, minLat, maxLon, maxLat },
+            bounds: [minLon, minLat, maxLon, maxLat],
             zoom: zoom ?? null,
         }));
     },

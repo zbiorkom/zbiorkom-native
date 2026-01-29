@@ -1,7 +1,7 @@
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useTheme } from "~/hooks/useTheme";
-import { BackHandler } from "react-native";
 import { useEffect, useRef } from "react";
+import useSystemBack from "~/hooks/useSystemBack";
 import BottomSheetHeader, { BottomSheetHeaderActions } from "./BottomSheetHeader";
 
 type Props = {
@@ -27,22 +27,18 @@ export default ({ open, backdrop, headerLeftComponent, headerActions, children, 
         }
     }, [open, bottomSheetRef]);
 
-    useEffect(() => {
-        if (!open) return;
-
-        const sub = BackHandler.addEventListener("hardwareBackPress", () => {
-            bottomSheetRef.current?.close();
-
-            return true;
-        });
-
-        return () => sub.remove();
-    }, [open, bottomSheetRef, onClose]);
+    useSystemBack(() => {
+        bottomSheetRef.current?.close();
+        onClose?.();
+        return true;
+    }, open);
 
     return (
         <BottomSheetModal
             index={0}
             ref={bottomSheetRef}
+            enableDynamicSizing={true}
+            enablePanDownToClose={true}
             backgroundStyle={{ backgroundColor: theme.colors.surface }}
             handleIndicatorStyle={{ backgroundColor: theme.colors.onSurfaceVariant }}
             handleComponent={() => (
