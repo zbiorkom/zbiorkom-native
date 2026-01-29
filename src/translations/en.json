@@ -1,0 +1,10 @@
+{
+    "vehicleTypes": {
+        "0": "Tram",
+        "1": "Metro",
+        "2": "Train",
+        "3": "Bus",
+        "4": "Ferry",
+        "11": "Trolleybus"
+    }
+}

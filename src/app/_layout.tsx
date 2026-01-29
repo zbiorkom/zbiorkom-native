@@ -6,6 +6,8 @@ import { ThemeProvider, useTheme } from "~/hooks/useTheme";
 import { Stack } from "expo-router";
 import { ThemeProvider as NavThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 
+import "../translations/i18n";
+
 SplashScreen.preventAutoHideAsync();
 
 export default () => {
