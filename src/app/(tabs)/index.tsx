@@ -45,7 +45,7 @@ export default () => {
                 const features = await mapRef.current?.queryRenderedFeaturesAtPoint(
                     [locationX * pixelRatio, locationY * pixelRatio],
                     undefined,
-                    ["vehicles", "stops"]
+                    ["positions", "stops"]
                 );
 
                 if (!features?.features.length) return;
@@ -54,8 +54,8 @@ export default () => {
                     const data: MarkersClicked = [];
 
                     for (const { properties } of features.features) {
-                        if (properties?.type === "vehicle") {
-                            data.push({ vehicle: properties.vehicle });
+                        if (properties?.type === "position") {
+                            data.push({ position: properties.position });
                         } else if (properties?.type === "stop") {
                             data.push({ stop: properties.stop });
                         }
@@ -65,7 +65,7 @@ export default () => {
                 } else {
                     const { properties } = features.features[0];
 
-                    if (properties?.type === "vehicle") {
+                    if (properties?.type === "position") {
                     } else if (properties?.type === "stop") {
                         setStop(properties.stop);
                     }
@@ -85,7 +85,7 @@ export default () => {
                         zoom: properties.zoomLevel,
                     });
                 }}
-                regionDidChangeDebounceTime={1}
+                regionDidChangeDebounceTime={0}
                 onDidFinishLoadingMap={async () => {
                     const [bounds, zoom] = await Promise.all([
                         mapRef.current?.getVisibleBounds(),

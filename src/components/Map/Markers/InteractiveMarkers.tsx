@@ -1,37 +1,36 @@
 import { CircleLayer, ShapeSource, SymbolLayer } from "@maplibre/maplibre-react-native";
-import { Stop, Vehicle } from "~/tools/compactTypings";
+import { EPosition, ERoute, EStop, Position, Stop } from "~/tools/typings";
 import { useMemo } from "react";
-import { normalizeLocation } from "~/tools/constants";
 
 type Props = {
-    vehicles: Vehicle[];
+    positions: Position[];
     stops: Stop[];
     showBrigade?: boolean;
     showFleet?: boolean;
 };
 
-export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
+export default ({ positions, stops, showBrigade, showFleet }: Props) => {
     const geojsonData: GeoJSON.FeatureCollection = useMemo(() => {
         const features: GeoJSON.Feature[] = [];
 
-        for (const vehicle of vehicles) {
-            const fleetId = vehicle.id.split("/")[1];
+        for (const position of positions) {
+            const fleetId = position[EPosition.id].split(":")[1];
 
             const size =
                 1 +
-                vehicle.route!.name.length * 0.25 +
-                (showBrigade && vehicle.brigade ? vehicle.brigade.length * 0.16 : 0) +
+                position[EPosition.route][ERoute.name].length * 0.25 +
+                (showBrigade && position[EPosition.brigade] ? position[EPosition.brigade].length * 0.16 : 0) +
                 (showFleet && !fleetId.startsWith("_") ? fleetId.length * 0.16 : 0);
 
             features.push({
                 type: "Feature",
                 geometry: {
                     type: "Point",
-                    coordinates: normalizeLocation(vehicle.location),
+                    coordinates: position[EPosition.location],
                 },
                 properties: {
-                    type: "vehicle",
-                    vehicle,
+                    type: "position",
+                    position,
                     size,
                 },
             });
@@ -42,7 +41,7 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
                 type: "Feature",
                 geometry: {
                     type: "Point",
-                    coordinates: normalizeLocation(stop.location),
+                    coordinates: stop[EStop.location],
                 },
                 properties: {
                     type: "stop",
@@ -55,7 +54,7 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
             type: "FeatureCollection",
             features,
         };
-    }, [vehicles, stops]);
+    }, [positions, stops]);
 
     return (
         <ShapeSource id="interactive-markers" shape={geojsonData}>
@@ -69,7 +68,7 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
             />
 
             <SymbolLayer
-                id="vehicles"
+                id="positions"
                 style={{
                     iconImage: "us-state_6",
                     iconSize: ["get", "size"],
@@ -77,7 +76,7 @@ export default ({ vehicles, stops, showBrigade, showFleet }: Props) => {
                     iconAllowOverlap: true,
                     iconPadding: [10],
                 }}
-                filter={["==", ["get", "type"], "vehicle"]}
+                filter={["==", ["get", "type"], "position"]}
             />
         </ShapeSource>
     );

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
+import EventSource from "react-native-sse";
 import { apiBase } from "~/tools/constants";
 
 type FetchQueryResult<T> = {
@@ -52,7 +52,6 @@ export function useFetchQuery<T = any>(
 
     return { data, isLoading, error };
 }
-
 type EventQueryOptions = {
     hasInitialData?: boolean;
     enabled?: boolean;
@@ -76,7 +75,7 @@ export function useEventQuery<T = any, I = T>(
     const [error, setError] = useState<string>();
 
     const isFirstMessage = useRef(true);
-    const abortController = useRef<AbortController | null>(null);
+    const esRef = useRef<EventSource | null>(null);
 
     useEffect(() => {
         if (!enabled) {
@@ -84,58 +83,51 @@ export function useEventQuery<T = any, I = T>(
             return;
         }
 
-        abortController.current = new AbortController();
         setIsLoading(true);
         setError(undefined);
         isFirstMessage.current = true;
 
-        const connect = async () => {
-            await fetchEventSource(apiBase + `/${city}/${endpoint}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                signal: abortController.current?.signal,
+        const es = new EventSource(`${apiBase}/${city}/${endpoint}`, {
+            pollingInterval: 0,
+            method: "GET",
+        });
 
-                async onopen(response) {
-                    if (response.ok) {
-                        return;
-                    } else {
-                        const json = await response.json().catch(() => null);
-                        setError(json?.error || "NETWORK_ERROR");
-                    }
-                },
+        esRef.current = es;
 
-                onmessage(msg) {
-                    if (!msg.data) return;
+        es.addEventListener("message", (event) => {
+            if (event.type !== "message" || !event.data) return;
 
-                    const parsed = JSON.parse(msg.data);
+            const parsed = JSON.parse(event.data);
 
-                    if (hasInitialData && isFirstMessage.current) {
-                        setInitialData(parsed as I);
-                        isFirstMessage.current = false;
-                        return;
-                    }
+            if (parsed.error) {
+                setError(parsed.error);
+                setIsLoading(false);
+                return es.close();
+            }
 
-                    setData(parsed as T);
-                    setIsLoading(false);
-                },
+            if (hasInitialData && isFirstMessage.current) {
+                setInitialData(parsed as I);
+                isFirstMessage.current = false;
 
-                onerror(err) {
-                    setError(err.message || String(err));
-                    setIsLoading(false);
-                },
+                return;
+            }
 
-                onclose() {
-                    setIsLoading(false);
-                },
-            });
-        };
+            setData(parsed as T);
+            setIsLoading(false);
+        });
 
-        connect();
+        es.addEventListener("error", (event) => {
+            console.error("EventSource error:", event);
+
+            setError("NETWORK_ERROR");
+            setIsLoading(false);
+            es.close();
+        });
 
         return () => {
-            abortController.current?.abort();
-            abortController.current = null;
+            es.removeAllEventListeners();
+            es.close();
+            esRef.current = null;
         };
     }, [city, endpoint, enabled, hasInitialData]);
 

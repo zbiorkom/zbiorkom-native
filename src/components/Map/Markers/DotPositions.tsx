@@ -1,21 +1,20 @@
 import { CircleLayer, ShapeSource } from "@maplibre/maplibre-react-native";
-import { DotVehicles } from "~/tools/compactTypings";
 import { useMemo } from "react";
-import { normalizeLocation } from "~/tools/constants";
+import { DotPosition, EDotPosition } from "~/tools/typings";
 
-export default ({ vehicles: { colors, vehicles } }: { vehicles: DotVehicles }) => {
+export default ({ dotPositions }: { dotPositions: DotPosition[] }) => {
     const geojsonData: GeoJSON.FeatureCollection = useMemo(() => {
         const features: GeoJSON.Feature[] = [];
 
-        for (let i = 0; i < vehicles.length; i += 3) {
+        for (const dot of dotPositions) {
             features.push({
                 type: "Feature",
                 geometry: {
                     type: "Point",
-                    coordinates: normalizeLocation([vehicles[i], vehicles[i + 1]]),
+                    coordinates: dot[EDotPosition.location],
                 },
                 properties: {
-                    color: colors[vehicles[i + 2]],
+                    color: dot[EDotPosition.color],
                 },
             });
         }
@@ -24,10 +23,10 @@ export default ({ vehicles: { colors, vehicles } }: { vehicles: DotVehicles }) =
             type: "FeatureCollection",
             features,
         };
-    }, [vehicles]);
+    }, [dotPositions]);
 
     return (
-        <ShapeSource id="vehicles-source" shape={geojsonData}>
+        <ShapeSource id="positions-source" shape={geojsonData}>
             <CircleLayer
                 id="dots"
                 style={{

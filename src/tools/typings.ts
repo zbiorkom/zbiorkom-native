@@ -74,14 +74,17 @@ export enum EStop {
     routes,
 }
 
-export type Trip = {
-    id: string;
-    city: string;
-    route: Route;
-    headsign: string;
-    brigade: string | undefined;
-    shortName: string | undefined;
-};
+export type Trip = [
+    id: string,
+    city: string,
+    route: Route,
+    headsign: string,
+    brigade: string | undefined,
+    shortName: string | undefined,
+    firstStop?: [name: string, arrival: number],
+    lastStop?: [name: string, departure: number],
+    distance?: number,
+];
 
 export enum ETrip {
     id,
@@ -90,6 +93,40 @@ export enum ETrip {
     headsign,
     brigade,
     shortName,
+    firstStop,
+    lastStop,
+    distance,
+}
+
+export type Position = [
+    id: string,
+    city: string,
+    route: Route,
+    brigade: string | undefined,
+    location: Point,
+    bearing: number | undefined,
+    timestamp?: number,
+    tripIdx?: number,
+    percentTraveled?: number,
+];
+
+export enum EPosition {
+    id,
+    city,
+    route,
+    brigade,
+    location,
+    bearing,
+    timestamp,
+    tripIdx,
+    percentTraveled,
+}
+
+export type DotPosition = [color: string, location: Point];
+
+export enum EDotPosition {
+    color,
+    location,
 }
 
 export interface RouteDetails {

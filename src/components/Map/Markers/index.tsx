@@ -1,8 +1,8 @@
-import { useWebsocketSubscription } from "~/hooks/useWebsocket";
+import { useEventQuery } from "~/hooks/useQuery";
 import useMapView from "~/hooks/useMapView";
 import { useShallow } from "zustand/shallow";
-import VehicleMarker from "./VehicleMarker";
-import DotVehicles from "./DotVehicles";
+import VehicleMarker from "./PositionMarker";
+import DotPositions from "./DotPositions";
 import { Portal } from "~/hooks/Portal";
 import InteractiveMarkers from "./InteractiveMarkers";
 import useSettings from "~/hooks/useSettings";
@@ -10,59 +10,40 @@ import StopMarker from "./StopMarker";
 import { MarkerView } from "@maplibre/maplibre-react-native";
 import AnimatedMarker from "./AnimatedMarker";
 import { useCity } from "~/hooks/useBackend";
-import { normalizeLocation } from "~/tools/constants";
+import { DotPosition, EPosition, EStop, Position, Stop } from "~/tools/typings";
 
 export default () => {
     const [bounds, zoom] = useMapView(useShallow((state) => [state.bounds!, state.zoom!]));
     const { showBrigade, showFleet, useStopCode } = useSettings();
     const [city] = useCity();
 
-    const { data } = useWebsocketSubscription("subscribeMapFeatures", {
-        options: {
-            city: city?.id || "",
-            bounds,
-            zoom,
-            filterRoutes: [],
-            filterModels: [],
-        },
-        disabled: !bounds || !zoom || !city,
-        mergeHandler: (prevData, newData) => {
-            if (newData.stopsChanged) return newData;
-
-            return {
-                ...newData,
-                stops: prevData?.stops || [],
-            };
-        },
+    const { data, initialData } = useEventQuery<
+        { positions?: Position[]; dots?: DotPosition[] },
+        { stops: Stop[] }
+    >(city?.id || "", `mapFeatures/${zoom}/${bounds?.join(",")}/stream`, {
+        enabled: !!city && !!bounds,
+        hasInitialData: true,
     });
-
-    if (!data) return null;
 
     return (
         <Portal host="map">
-            {data.stops.map((stop) => (
-                <MarkerView
-                    coordinate={normalizeLocation(stop.location)}
-                    key={stop.id}
-                >
+            {initialData?.stops?.map((stop) => (
+                <MarkerView coordinate={stop[EStop.location]} key={stop[EStop.id]}>
                     <StopMarker stop={stop} useStopCode={useStopCode} />
                 </MarkerView>
             ))}
 
-            {data.vehicles.map((vehicle) => (
-                <AnimatedMarker
-                    coordinate={normalizeLocation(vehicle.location)}
-                    key={vehicle.id}
-                >
-                    <VehicleMarker vehicle={vehicle} showBrigade={showBrigade} showFleet={showFleet} />
+            {data?.positions?.map((position) => (
+                <AnimatedMarker coordinate={position[EPosition.location]} key={position[EPosition.id]}>
+                    <VehicleMarker position={position} showBrigade={showBrigade} showFleet={showFleet} />
                 </AnimatedMarker>
             ))}
 
-            {data.dotVehicles && <DotVehicles vehicles={data.dotVehicles} />}
+            {data?.dots && <DotPositions dotPositions={data.dots} />}
 
             <InteractiveMarkers
-                vehicles={data.vehicles}
-                stops={data.stops}
+                positions={data?.positions || []}
+                stops={initialData?.stops || []}
                 showBrigade={showBrigade}
                 showFleet={showFleet}
             />

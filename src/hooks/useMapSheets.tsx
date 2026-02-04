@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { Stop, VehicleType } from "~/tools/typings";
+import { Position, Stop } from "~/tools/typings";
 
-export type MarkersClicked = { vehicle?: VehicleType; stop?: Stop }[];
+export type MarkersClicked = { position?: Position; stop?: Stop }[];
 export type SheetType = "MarkersClicked" | "Stop";
 
 interface MapSheetsState {

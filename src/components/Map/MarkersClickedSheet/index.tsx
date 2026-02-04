@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { List, TouchableRipple } from "react-native-paper";
 import { useShallow } from "zustand/shallow";
 import useMapSheets from "~/hooks/useMapSheets";
-import VehicleMarker from "../Markers/VehicleMarker";
+import VehicleMarker from "../Markers/PositionMarker";
 import StopMarker from "../Markers/StopMarker";
 import { useTheme } from "~/hooks/useTheme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -33,7 +33,7 @@ export default ({ open }: { open: boolean }) => {
                     }}
                 >
                     {markersClicked?.map((marker, index) => {
-                        if (marker.vehicle) {
+                        if (marker.position) {
                             return (
                                 <TouchableRipple
                                     key={`marker-clicked-ripple-${index}`}
@@ -46,7 +46,7 @@ export default ({ open }: { open: boolean }) => {
                                     ]}
                                 >
                                     <VehicleMarker
-                                        vehicle={marker.vehicle!}
+                                        position={marker.position}
                                         showBrigade={showBrigade}
                                         showFleet={showFleet}
                                         style={colorScheme === "dark" ? { filter: darkFilter } : {}}
@@ -77,7 +77,11 @@ export default ({ open }: { open: boolean }) => {
                                             />
                                         )}
                                         title={`${marker.stop[EStop.name]} ${marker.stop[EStop.code] || ""}`}
-                                        description={`➜ ${marker.stop[EStop.direction]}`}
+                                        description={
+                                            marker.stop[EStop.direction]
+                                                ? `➜ ${marker.stop[EStop.direction]}`
+                                                : undefined
+                                        }
                                         descriptionNumberOfLines={1}
                                         style={{ paddingVertical: 0 }}
                                     />

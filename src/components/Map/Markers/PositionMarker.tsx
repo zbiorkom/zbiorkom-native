@@ -3,40 +3,45 @@ import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import { Icon, Text } from "react-native-paper";
 import { halfTransparentText } from "~/tools/constants";
 import RouteIcon from "@/ui/RouteIcon";
+import { EPosition, ERoute, Position } from "~/tools/typings";
 
 type Props = {
-    vehicle: Vehicle;
+    position: Position;
     showBrigade?: boolean;
     showFleet?: boolean;
     style?: StyleProp<ViewStyle>;
 };
 
-export default ({ vehicle, showBrigade, showFleet, style }: Props) => {
-    const fleetId = vehicle.id.includes("/") ? vehicle.id.split("/")[1] : vehicle.id;
+export default ({ position, showBrigade, showFleet, style }: Props) => {
+    const fleetId = position[EPosition.id].split(":")[1];
 
     return (
         <View
             collapsable={false}
-            style={[styles.vehicleContainer, { backgroundColor: vehicle.route?.color }, style]}
+            style={[
+                styles.vehicleContainer,
+                { backgroundColor: position[EPosition.route][ERoute.color] },
+                style,
+            ]}
         >
             <>
-                {vehicle.bearing !== undefined && (
-                    <View style={{ transform: [{ rotate: `${vehicle.bearing}deg` }] }}>
+                {position[EPosition.bearing] !== undefined && (
+                    <View style={{ transform: [{ rotate: `${position[EPosition.bearing]}deg` }] }}>
                         <Icon source="arrow-up" size={16} color={halfTransparentText} />
                     </View>
                 )}
 
                 <RouteIcon
-                    type={vehicle.route!.type}
-                    agency={vehicle.route!.agency}
+                    type={position[EPosition.route][ERoute.type]}
+                    agency={position[EPosition.route][ERoute.agency]}
                     color={halfTransparentText}
                     size={16}
                 />
 
-                <Text style={styles.routeText}>{vehicle.route?.name}</Text>
+                <Text style={styles.routeText}>{position[EPosition.route][ERoute.name]}</Text>
 
                 <Text style={styles.detailsText}>
-                    {showBrigade && vehicle.brigade ? `/${vehicle.brigade}` : ""}
+                    {showBrigade && position[EPosition.brigade] ? `/${position[EPosition.brigade]}` : ""}
                     {showFleet && !fleetId.startsWith("_") ? `/${fleetId}` : ""}
                 </Text>
             </>

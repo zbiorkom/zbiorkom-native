@@ -8,7 +8,6 @@ import useMapSheets from "~/hooks/useMapSheets";
 import StopMarker from "../Markers/StopMarker";
 import useSettings from "~/hooks/useSettings";
 import StopSheetHeader from "./StopSheetHeader";
-import { normalizeLocation } from "~/tools/constants";
 import { useEffect } from "react";
 import { useMapNavigate } from "~/hooks/useMapView";
 import { EStop } from "~/tools/typings";
@@ -21,7 +20,7 @@ export default ({ open }: { open: boolean }) => {
     useEffect(() => {
         if (!open || !stop) return;
 
-        navigateTo(normalizeLocation(stop[EStop.location]), 16);
+        navigateTo(stop[EStop.location], 16);
     }, [open, stop]);
 
     if (!stop) return null;
@@ -56,7 +55,7 @@ export default ({ open }: { open: boolean }) => {
 
             {open && (
                 <Portal host="map">
-                    <MarkerView coordinate={normalizeLocation(stop[EStop.location])} key={stop[EStop.id]}>
+                    <MarkerView coordinate={stop[EStop.location]} key={stop[EStop.id]}>
                         <StopMarker stop={stop} useStopCode={useStopCode} />
                     </MarkerView>
                 </Portal>

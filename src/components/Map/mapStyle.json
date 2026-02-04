@@ -3,7 +3,7 @@
     "name": "zbiorkom-openfreemap",
     "metadata": {},
     "center": [21.011956, 52.230009],
-    "zoom": 15.64,
+    "zoom": 15,
     "sources": {
         "openfreemap": {
             "type": "vector",

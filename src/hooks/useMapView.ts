@@ -18,7 +18,7 @@ const useMapView = create<MapViewState>((set, get) => ({
     cameraRef: null,
     bounds: null,
     zoom: null,
-    setView: ({ bounds: [[minLon, minLat], [maxLon, maxLat]], zoom }) => {
+    setView: ({ bounds: [[maxLon, maxLat], [minLon, minLat]], zoom }) => {
         set(() => ({
             bounds: [minLon, minLat, maxLon, maxLat],
             zoom: zoom ?? null,
