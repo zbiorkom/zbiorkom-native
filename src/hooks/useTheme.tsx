@@ -76,7 +76,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                 },
             },
             fonts: configureFonts({
-                config: { fontFamily: "TIDUI" },
+                config: { fontFamily: "GoogleSansFlex" },
                 isV3: true,
             }),
         };

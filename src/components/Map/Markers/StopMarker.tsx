@@ -65,7 +65,7 @@ export default ({ stop, useStopCode, style }: Props) => {
                             fontWeight="bolder"
                             textAnchor="middle"
                             alignmentBaseline="middle"
-                            fontFamily="TIDUI"
+                            fontFamily="GoogleSansFlex"
                         >
                             {stop[EStop.code]}
                         </Text>

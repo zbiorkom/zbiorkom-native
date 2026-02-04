@@ -39,30 +39,30 @@
                 "expo-font",
                 {
                     "fonts": [
-                        "./assets/fonts/TIDUI-Light.ttf",
-                        "./assets/fonts/TIDUI-Regular.ttf",
-                        "./assets/fonts/TIDUI-Medium.ttf",
-                        "./assets/fonts/TIDUI-Bold.ttf"
+                        "./assets/fonts/GoogleSansFlex-Light.ttf",
+                        "./assets/fonts/GoogleSansFlex-Regular.ttf",
+                        "./assets/fonts/GoogleSansFlex-Medium.ttf",
+                        "./assets/fonts/GoogleSansFlex-Bold.ttf"
                     ],
                     "android": {
                         "fonts": [
                             {
-                                "fontFamily": "TIDUI",
+                                "fontFamily": "GoogleSansFlex",
                                 "fontDefinitions": [
                                     {
-                                        "path": "./assets/fonts/TIDUI-Light.ttf",
+                                        "path": "./assets/fonts/GoogleSansFlex-Light.ttf",
                                         "weight": 300
                                     },
                                     {
-                                        "path": "./assets/fonts/TIDUI-Regular.ttf",
+                                        "path": "./assets/fonts/GoogleSansFlex-Regular.ttf",
                                         "weight": 400
                                     },
                                     {
-                                        "path": "./assets/fonts/TIDUI-Medium.ttf",
+                                        "path": "./assets/fonts/GoogleSansFlex-Medium.ttf",
                                         "weight": 500
                                     },
                                     {
-                                        "path": "./assets/fonts/TIDUI-Bold.ttf",
+                                        "path": "./assets/fonts/GoogleSansFlex-Bold.ttf",
                                         "weight": 700
                                     }
                                 ]
@@ -71,10 +71,10 @@
                     },
                     "ios": {
                         "fonts": [
-                            "./assets/fonts/TIDUI-Light.ttf",
-                            "./assets/fonts/TIDUI-Regular.ttf",
-                            "./assets/fonts/TIDUI-Medium.ttf",
-                            "./assets/fonts/TIDUI-Bold.ttf"
+                            "./assets/fonts/GoogleSansFlex-Light.ttf",
+                            "./assets/fonts/GoogleSansFlex-Regular.ttf",
+                            "./assets/fonts/GoogleSansFlex-Medium.ttf",
+                            "./assets/fonts/GoogleSansFlex-Bold.ttf"
                         ]
                     }
                 }
