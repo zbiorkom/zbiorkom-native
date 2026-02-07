@@ -76,23 +76,53 @@ export function useEventQuery<T = any, I = T>(
 
     const isFirstMessage = useRef(true);
     const esRef = useRef<EventSource | null>(null);
+    const prevEsRef = useRef<EventSource | null>(null);
+    const keyRef = useRef<string | null>(null);
 
     useEffect(() => {
         if (!enabled) {
+            if (esRef.current) {
+                esRef.current.removeAllEventListeners();
+                esRef.current.close();
+
+                esRef.current = null;
+            }
+            if (prevEsRef.current) {
+                prevEsRef.current.removeAllEventListeners();
+                prevEsRef.current.close();
+
+                prevEsRef.current = null;
+            }
+
             setIsLoading(false);
             return;
         }
 
+        const key = `${city}/${endpoint}`;
+        keyRef.current = key;
+
         setIsLoading(true);
         setError(undefined);
         isFirstMessage.current = true;
+        prevEsRef.current = esRef.current;
 
         const es = new EventSource(`${apiBase}/${city}/${endpoint}`, {
+            timeoutBeforeConnection: 0,
+            timeout: 0,
             pollingInterval: 0,
             method: "GET",
         });
 
         esRef.current = es;
+
+        es.addEventListener("open", () => {
+            if (prevEsRef.current && prevEsRef.current !== esRef.current) {
+                prevEsRef.current.removeAllEventListeners();
+                prevEsRef.current.close();
+
+                prevEsRef.current = null;
+            }
+        });
 
         es.addEventListener("message", (event) => {
             if (event.type !== "message" || !event.data) return;
@@ -117,17 +147,33 @@ export function useEventQuery<T = any, I = T>(
         });
 
         es.addEventListener("error", (event) => {
-            console.error("EventSource error:", event);
-
             setError("NETWORK_ERROR");
             setIsLoading(false);
             es.close();
         });
 
         return () => {
-            es.removeAllEventListeners();
-            es.close();
+            if (es) {
+                es.removeAllEventListeners();
+                es.close();
+            }
+
+            if (esRef.current && esRef.current !== es) {
+                esRef.current.removeAllEventListeners();
+                esRef.current.close();
+
+                esRef.current = null;
+            }
+
+            if (prevEsRef.current) {
+                prevEsRef.current.removeAllEventListeners();
+                prevEsRef.current.close();
+
+                prevEsRef.current = null;
+            }
+
             esRef.current = null;
+            keyRef.current = null;
         };
     }, [city, endpoint, enabled, hasInitialData]);
 
