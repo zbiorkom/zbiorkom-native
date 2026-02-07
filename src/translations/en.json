@@ -6,5 +6,12 @@
         "3": "Bus",
         "4": "Ferry",
         "11": "Trolleybus"
+    },
+    "punctuality": {
+        "onTime": "On time",
+        "early": "{{time}} early",
+        "late": "{{time}} late",
+        "cancelled": "Cancelled",
+        "unknown": "No data about delay"
     }
 }

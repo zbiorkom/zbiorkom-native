@@ -3,6 +3,7 @@ import { useTheme } from "~/hooks/useTheme";
 import { useEffect, useRef } from "react";
 import useSystemBack from "~/hooks/useSystemBack";
 import BottomSheetHeader, { BottomSheetHeaderActions } from "./BottomSheetHeader";
+import { Dimensions } from "react-native";
 
 type Props = {
     open: boolean;
@@ -37,8 +38,8 @@ export default ({ open, backdrop, headerLeftComponent, headerActions, children, 
         <BottomSheetModal
             index={0}
             ref={bottomSheetRef}
-            enableDynamicSizing={true}
-            enablePanDownToClose={true}
+            enableDynamicSizing
+            enablePanDownToClose
             backgroundStyle={{ backgroundColor: theme.colors.surface }}
             handleIndicatorStyle={{ backgroundColor: theme.colors.onSurfaceVariant }}
             handleComponent={() => (
@@ -54,6 +55,8 @@ export default ({ open, backdrop, headerLeftComponent, headerActions, children, 
                 if (fromIndex === 0 && toIndex === -1) {
                 }
             }}
+            snapPoints={["30%", "60%"]}
+            maxDynamicContentSize={Dimensions.get("window").height * 0.6}
             children={children}
         />
     );

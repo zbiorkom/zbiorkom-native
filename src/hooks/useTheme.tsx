@@ -22,8 +22,7 @@ const ThemeContext = createContext<ThemeContextData>({
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const [sourceColor, setSourceColor] = useState<string>(defaultColor);
-    const _colorScheme = useColorScheme();
-    const colorScheme = _colorScheme === "unspecified" ? "dark" : _colorScheme;
+    const colorScheme = useColorScheme() ?? "dark";
 
     const theme = useMemo(() => {
         const scheme = new (colorScheme === "dark" ? DarkScheme : LightScheme)(sourceColor, false);
@@ -70,7 +69,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
                     level0: scheme.getTone("neutralVariant", colorScheme === "dark" ? 6 : 100),
                     level1: scheme.getTone("neutralVariant", colorScheme === "dark" ? 12 : 95),
                     level2: scheme.getTone("neutralVariant", colorScheme === "dark" ? 18 : 90),
-                    level3: scheme.getTone("neutralVariant", colorScheme === "dark" ? 24 : 85),
+                    level3: scheme.getTone("neutralVariant", colorScheme === "dark" ? 24 : 90),
                     level4: scheme.getTone("neutralVariant", colorScheme === "dark" ? 30 : 80),
                     level5: scheme.getTone("neutralVariant", colorScheme === "dark" ? 36 : 75),
                 },

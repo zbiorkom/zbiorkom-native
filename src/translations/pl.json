@@ -6,5 +6,12 @@
         "3": "Autobus",
         "4": "Prom",
         "11": "Trolejbus"
+    },
+    "punctuality": {
+        "onTime": "Planowo",
+        "early": "{{time}} przed czasem",
+        "late": "Opóźniony o {{time}}",
+        "cancelled": "Odwołany",
+        "unknown": "Brak danych o opóźnieniu"
     }
 }

@@ -129,6 +129,24 @@ export enum EDotPosition {
     location,
 }
 
+export type StopDeparture = [
+    trip: Trip,
+    position: Position | undefined,
+    scheduledDeparture: number,
+    delay: number | undefined,
+    status: StopDepartureStatus,
+    platform: string | undefined,
+];
+
+export enum EStopDeparture {
+    trip,
+    position,
+    scheduledDeparture,
+    delay,
+    status,
+    platform,
+}
+
 export interface RouteDetails {
     route: Route;
     graph: RouteGraphDirection[];
@@ -167,4 +185,11 @@ export enum EDirectionEdgeType {
     Normal = 0,
     Deviation = 1,
     Branch = 2,
+}
+
+export enum StopDepartureStatus {
+    Scheduled,
+    OnTrip,
+    OnPreviousTrip,
+    Cancelled,
 }

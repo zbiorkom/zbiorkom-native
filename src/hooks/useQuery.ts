@@ -9,7 +9,7 @@ type FetchQueryResult<T> = {
 };
 
 export function useFetchQuery<T = any>(
-    city: string,
+    city: string | undefined,
     endpoint: string,
     enabled: boolean = true,
 ): FetchQueryResult<T> {
@@ -22,7 +22,7 @@ export function useFetchQuery<T = any>(
     useEffect(() => {
         const key = `${city}/${endpoint}`;
 
-        if (!enabled) return;
+        if (!enabled || !city) return;
         if (data && fetchedKey.current === key) return;
 
         const fetchData = async () => {
@@ -65,7 +65,7 @@ type EventQueryResult<T, I> = {
 };
 
 export function useEventQuery<T = any, I = T>(
-    city: string,
+    city: string | undefined,
     endpoint: string,
     { hasInitialData = false, enabled = true }: EventQueryOptions = {},
 ): EventQueryResult<T, I> {
@@ -80,7 +80,7 @@ export function useEventQuery<T = any, I = T>(
     const keyRef = useRef<string | null>(null);
 
     useEffect(() => {
-        if (!enabled) {
+        if (!enabled || !city) {
             if (esRef.current) {
                 esRef.current.removeAllEventListeners();
                 esRef.current.close();
