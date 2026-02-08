@@ -13,10 +13,10 @@ export default () => {
             {(!openSheet || openSheet === "MarkersClicked") && (
                 <>
                     <Markers />
-                    <FabButtons />
                 </>
             )}
 
+            <FabButtons />
             <MarkersClickedSheet open={openSheet === "MarkersClicked"} />
             <StopSheet open={openSheet === "Stop"} />
         </>

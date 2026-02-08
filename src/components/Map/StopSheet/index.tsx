@@ -1,7 +1,6 @@
 import BottomSheet from "@/BottomSheet";
-import { BottomSheetScrollView, BottomSheetView, BottomSheetVirtualizedList } from "@gorhom/bottom-sheet";
+import { BottomSheetVirtualizedList } from "@gorhom/bottom-sheet";
 import { MarkerView } from "@maplibre/maplibre-react-native";
-import { Text } from "react-native-paper";
 import { useShallow } from "zustand/shallow";
 import { Portal } from "~/hooks/Portal";
 import useMapSheets from "~/hooks/useMapSheets";
@@ -11,9 +10,8 @@ import StopSheetHeader from "./StopSheetHeader";
 import { useEffect } from "react";
 import { useMapNavigate } from "~/hooks/useMapView";
 import { EStop, Stop, StopDeparture } from "~/tools/typings";
-import { useEventQuery, useFetchQuery } from "~/hooks/useQuery";
+import { useEventQuery } from "~/hooks/useQuery";
 import StopSheetDeparture from "./StopSheetDeparture";
-import { VirtualizedList } from "react-native";
 
 export default ({ open }: { open: boolean }) => {
     const [stop, goBack] = useMapSheets(useShallow((state) => [state.stop, state.goBack]));
@@ -32,6 +30,7 @@ export default ({ open }: { open: boolean }) => {
         {
             enabled: !!stop,
             hasInitialData: true,
+            resetDataOnKeyChange: true,
         },
     );
 
@@ -60,23 +59,15 @@ export default ({ open }: { open: boolean }) => {
                 ]}
                 onClose={goBack}
             >
-                <BottomSheetScrollView>
-                    {isLoading && <Text>Ładowanie...</Text>}
-                    {error && <Text>Błąd: {error}</Text>}
-                    {data?.length === 0 && <Text>Brak odjazdów</Text>}
-
-                    {data?.map((departure, index) => (
-                        <StopSheetDeparture departure={departure} key={`dep${index}`} />
-                    ))}
-                </BottomSheetScrollView>
-                {/* <BottomSheetVirtualizedList 
+                <BottomSheetVirtualizedList
                     data={data || []}
-                    keyExtractor={(i) => `dep${i}`}
-                    getItemCount={(data) => data.length}
-                    getItem={(data, index) => data[index]}
-                    renderItem={({ item }) => <StopSheetDeparture departure={item} />}
-                /> */}
-                
+                    keyExtractor={(i: number) => `dep${i}`}
+                    getItemCount={(data: StopDeparture[]) => data.length}
+                    getItem={(data: StopDeparture[], index: number) => data[index]}
+                    renderItem={({ item }: { item: StopDeparture }) => (
+                        <StopSheetDeparture departure={item} />
+                    )}
+                />
             </BottomSheet>
 
             {open && (

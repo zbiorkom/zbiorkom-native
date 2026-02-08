@@ -27,6 +27,13 @@ export default ({ departure }: { departure: StopDeparture }) => {
                         status={departure[EStopDeparture.status]}
                         darkMode={darkMode}
                     />
+                    <Text>·</Text>
+                    <Text>
+                        {new Date(departure[EStopDeparture.scheduledDeparture]).toLocaleTimeString("pl", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })}
+                    </Text>
                 </View>
             </>
         </TouchableRipple>
@@ -45,5 +52,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 8,
     },
-    details: {},
+    details: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+    },
 });

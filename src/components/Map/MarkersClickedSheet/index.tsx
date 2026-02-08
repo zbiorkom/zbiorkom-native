@@ -20,6 +20,8 @@ export default ({ open }: { open: boolean }) => {
         useShallow((state) => [state.markersClicked, state.setStop, state.goBack]),
     );
 
+    if (!markersClicked) return null;
+
     return (
         <BottomSheet open={open} backdrop onClose={goBack}>
             <BottomSheetScrollView>

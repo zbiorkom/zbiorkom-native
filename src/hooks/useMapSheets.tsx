@@ -14,17 +14,13 @@ interface MapSheetsState {
 }
 
 export default create<MapSheetsState>((set) => {
-    const push = (type: SheetType) => set(({ stack }) => ({ stack: [...stack, type] }));
-
     return {
         stack: [],
         setMarkersClicked: (markers: MarkersClicked) => {
-            set({ markersClicked: markers });
-            push("MarkersClicked");
+            set(({ stack }) => ({ markersClicked: markers, stack: [...stack, "MarkersClicked"] }));
         },
         setStop: (stop: Stop) => {
-            set({ stop });
-            push("Stop");
+            set(({ stack }) => ({ stop, stack: [...stack, "Stop"] }));
         },
         goBack: () => set(({ stack }) => ({ stack: stack.slice(0, -1) })),
     };

@@ -30,7 +30,7 @@ export default ({ open, backdrop, headerLeftComponent, headerActions, children, 
 
     useSystemBack(() => {
         bottomSheetRef.current?.close();
-        onClose?.();
+
         return true;
     }, open);
 
