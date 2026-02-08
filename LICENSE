@@ -1,0 +1,42 @@
+ZBIORKOM.LIVE SOURCE AVAILABLE LICENSE
+Version 1.0
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. DEFINITIONS
+    "The Software" refers to the source code, assets, and compiled application contained in this repository.
+    "The Author" refers to the original creator of this repository.
+    "Official Instance" refers to the official backend infrastructure and API servers provided by The Author.
+
+2. SOURCE CODE ACCESS AND CONTRIBUTION
+    You are granted a non-exclusive license to view, download, and modify the source code for personal use, educational purposes, or to contribute improvements (Pull Requests) back to the original repository.
+
+3. RESTRICTIONS ON DISTRIBUTION (FORKS)
+    You may distribute modified versions of The Software (forks), subject to the following STRICT conditions:
+
+    A. MANDATORY "UNOFFICIAL" LABELING
+        If you distribute a modified version of The Software, you MUST clearly indicate that it is an UNOFFICIAL modification.
+            - You are required to retain the original branding and logo to attribute the source.
+            - However, you MUST explicitly add a prominent and clearly visible disclaimer (e.g., "Unofficial Community Build", "Modified Version") in the application title, splash screen, or "About" section.
+            - You may not present your fork as the official version of the application.
+
+   B. BACKEND INTEGRITY LOCK – CORE API ENDPOINTS
+        You are STRICTLY PROHIBITED from:
+            - Modifying The Software to redirect CORE APPLICATION ENDPOINTS to any server infrastructure other than the Official Instance.
+            - Creating, hosting, or distributing modified versions that connect to a cloned, reverse-engineered, or competing backend service that replicates the functionality of the Official Instance's core API endpoints.
+
+        PERMITTED MODIFICATIONS:
+            - You MAY add integrations with third-party services or your own complementary APIs (e.g., calendar plugins, analytics modules) that do NOT replace or duplicate the core functionality provided by the Official Instance.
+            - You MAY modify UI/UX elements, translations, styling, and client-side logic that do not alter the backend connection logic.
+
+4. NON-COMMERCIAL USE
+    The Software is provided for non-commercial purposes only.
+        - You may not sell the application.
+        - You may not inject advertisements.
+        - You may not use the source code to build a competing commercial product.
+
+5. DISCLAIMER OF WARRANTY
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+
+6. TERMINATION
+    Any use of The Software in violation of these terms automatically terminates your rights under this license.
