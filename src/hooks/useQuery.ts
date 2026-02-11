@@ -53,7 +53,6 @@ export function useFetchQuery<T = any>(
     return { data, isLoading, error };
 }
 type EventQueryOptions = {
-    hasInitialData?: boolean;
     enabled?: boolean;
     resetDataOnKeyChange?: boolean;
 };
@@ -68,15 +67,13 @@ type EventQueryResult<T, I> = {
 export function useEventQuery<T = any, I = T>(
     city: string | undefined,
     endpoint: string,
-    { hasInitialData = false, enabled = true, resetDataOnKeyChange = false }: EventQueryOptions = {},
+    { enabled = true, resetDataOnKeyChange = false }: EventQueryOptions = {},
 ): EventQueryResult<T, I> {
     const [data, setData] = useState<T>();
     const [initialData, setInitialData] = useState<I>();
     const [isLoading, setIsLoading] = useState<boolean>(enabled);
     const [error, setError] = useState<string>();
 
-    const isFirstMessage = useRef(true);
-    const startTimeRef = useRef<number | null>(null);
     const esRef = useRef<EventSource | null>(null);
     const prevEsRef = useRef<EventSource | null>(null);
     const keyRef = useRef<string | null>(null);
@@ -108,12 +105,10 @@ export function useEventQuery<T = any, I = T>(
             setData(undefined);
             setInitialData(undefined);
         }
-        startTimeRef.current = Date.now();
         setError(undefined);
-        isFirstMessage.current = true;
         prevEsRef.current = esRef.current;
 
-        const es = new EventSource(`${apiBase}/${city}/${endpoint}`, {
+        const es = new EventSource<"initial" | "message" | "errorCode">(`${apiBase}/${city}/${endpoint}`, {
             timeoutBeforeConnection: 0,
             timeout: 0,
             pollingInterval: 0,
@@ -131,33 +126,19 @@ export function useEventQuery<T = any, I = T>(
             }
         });
 
+        es.addEventListener("initial", (event) => {
+            setInitialData(JSON.parse(event.data!) as I);
+        });
+
         es.addEventListener("message", (event) => {
-            if (event.type !== "message" || !event.data) return;
-
-            const parsed = JSON.parse(event.data);
-
-            if (parsed.error) {
-                setError(parsed.error);
-                setIsLoading(false);
-                return es.close();
-            }
-
-            if (hasInitialData && isFirstMessage.current) {
-                setInitialData(parsed as I);
-                isFirstMessage.current = false;
-
-                return;
-            }
-
-            if (startTimeRef.current !== null) {
-                const elapsed = Date.now() - startTimeRef.current;
-                // debug: ms until first data in `data` since hook registration
-                console.debug(`useEventQuery ${keyRef.current} first data received in ${elapsed}ms`);
-                startTimeRef.current = null;
-            }
-
-            setData(parsed as T);
+            setData(JSON.parse(event.data!) as T);
             setIsLoading(false);
+        });
+
+        es.addEventListener("errorCode", (event) => {
+            setError(event.data!);
+            setIsLoading(false);
+            es.close();
         });
 
         es.addEventListener("error", (event) => {
@@ -188,9 +169,8 @@ export function useEventQuery<T = any, I = T>(
 
             esRef.current = null;
             keyRef.current = null;
-            startTimeRef.current = null;
         };
-    }, [city, endpoint, enabled, hasInitialData]);
+    }, [city, endpoint, enabled]);
 
     return {
         data,

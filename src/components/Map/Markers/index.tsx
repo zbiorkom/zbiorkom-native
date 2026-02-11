@@ -22,7 +22,6 @@ export default () => {
         { stops: Stop[] }
     >(city?.id || "", `mapFeatures/${zoom}/${bounds?.join(",")}/stream`, {
         enabled: !!city && !!bounds,
-        hasInitialData: true,
     });
 
     return (

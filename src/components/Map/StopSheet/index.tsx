@@ -29,7 +29,6 @@ export default ({ open }: { open: boolean }) => {
         `stops/${stop?.[EStop.id]}/stream`,
         {
             enabled: !!stop,
-            hasInitialData: true,
             resetDataOnKeyChange: true,
         },
     );
