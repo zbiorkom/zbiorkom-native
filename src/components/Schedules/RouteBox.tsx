@@ -14,11 +14,11 @@ export default memo(({ route }: { route: Route }) => {
     const theme = useMemo(() => new DarkScheme(route[ERoute.color]), [route]);
     const backgroundColor = useMemo(
         () => (colorScheme === "dark" ? theme.primaryContainer + "33" : theme.onPrimaryContainer + "bb"),
-        [colorScheme, theme]
+        [colorScheme, theme],
     );
     const textColor = useMemo(
         () => (colorScheme === "dark" ? theme.onPrimaryContainer : theme.primaryContainer),
-        [colorScheme, theme]
+        [colorScheme, theme],
     );
 
     const [longNameFirst, longNameSecond] = useMemo(() => route[ERoute.longName].split("—"), [route]);
@@ -39,6 +39,7 @@ export default memo(({ route }: { route: Route }) => {
             <>
                 <View style={[styles.routeNameContainer, { backgroundColor: theme.primaryContainer }]}>
                     <RouteIcon
+                        city={route[ERoute.city]}
                         type={route[ERoute.type]}
                         agency={route[ERoute.agency]}
                         color={theme.onPrimaryContainer}

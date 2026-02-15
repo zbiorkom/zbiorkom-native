@@ -20,19 +20,30 @@ const typeIcons: Record<number, string> = {
     [VehicleType.Trolleybus]: `<path d="M6.613.388h10.725a45 45 0 0 1 .025 1.9q-1.738-.006-3.475.013a190 190 0 0 0-.975 2.25 25 25 0 0 1 3.15.3q1.052.172 2.025.6 1.703.804 1.888 2.688.025 5.175 0 10.35-.177 1.166-.975 2.025a60 60 0 0 1-.05 2.4q-.175.5-.688.638a10 10 0 0 1-1.375.025q-.628-.078-.863-.663a12 12 0 0 1-.038-1.325h-8a12 12 0 0 1-.038 1.325q-.234.584-.863.663a10 10 0 0 1-1.375-.025q-.513-.138-.688-.638a126 126 0 0 1-.063-2.4q-.783-.866-.963-2.025a564 564 0 0 1 .025-10.575q.324-1.591 1.763-2.337.967-.472 2.025-.675a23 23 0 0 1 2.725-.325l1.175-2.275q-2.538-.019-5.075-.013a43 43 0 0 1-.025-1.9m-.625 9.2h12v2.975h-12zm2.25 6q1.338-.08 1.713 1.2.151 1.147-.888 1.663-1.24.391-1.913-.713-.471-1.208.588-1.963.245-.121.5-.188m7 0q1.338-.08 1.713 1.2.151 1.147-.888 1.663-1.24.391-1.913-.713-.471-1.208.588-1.963.245-.121.5-.188" />`,
 };
 
-type Props = {
-    type: VehicleType;
-    agency?: string;
-    color?: string;
-    size?: number;
-};
+type Props =
+    | {
+          city?: string;
+          agency?: undefined;
+          type: VehicleType;
+          color?: string;
+          size?: number;
+      }
+    | {
+          city: string;
+          type: VehicleType;
+          agency: string;
+          color?: string;
+          size?: number;
+      };
 
-export default ({ type, agency, color, size }: Props) => {
-    const agencies = useAgencies(); // fix: only shows agencies from selected city
+export default ({ city, type, agency, color, size }: Props) => {
+    const agencies = useAgencies();
+
+    const agencyIcon = agency && agencies[`${city}_${agency}`]?.icon;
 
     return (
         <SvgXml
-            xml={"<svg>" + (agencies[agency!]?.icon || typeIcons[type]) + "</svg>"}
+            xml={"<svg>" + (agencyIcon || typeIcons[type]) + "</svg>"}
             viewBox="0 0 24 24"
             width={size}
             height={size}

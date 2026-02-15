@@ -69,17 +69,14 @@ export const BackendProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const agencies = useMemo(() => {
         const result: Record<string, Agency> = {};
 
-        if (!currentCity) return result;
-
-        const city = (cities?.cities || []).find((c) => c.id === currentCity);
-        if (!city) return result;
-
-        for (const [agencyId, agency] of Object.entries(city.agencies || {})) {
-            result[agencyId] = agency;
+        for (const city of cities?.cities || []) {
+            for (const [agencyId, agency] of Object.entries(city.agencies || {})) {
+                result[`${city.id}_${agencyId}`] = agency;
+            }
         }
 
         return result;
-    }, [cities?.cities, currentCity]);
+    }, [cities?.cities]);
 
     const contextValue = useMemo(
         () => ({ cities: cities?.cities || [], currentCity: currentCity, setCurrentCity, agencies }),

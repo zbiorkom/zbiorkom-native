@@ -98,6 +98,30 @@ export enum ETrip {
     distance,
 }
 
+export type Itinerary = [stops: ItineraryStop[], shape: string];
+
+export enum EItinerary {
+    stops,
+    shape,
+}
+
+export type ItineraryStop = [stop: Stop, alight: number, distance: number];
+
+export enum EItineraryStop {
+    stop,
+    alight,
+    distance,
+}
+
+export type StopTime = [scheduledTime: number, delay: number, status: StopDepartureStatus, platform?: string];
+
+export enum EStopTime {
+    scheduledTime,
+    delay,
+    status,
+    platform,
+}
+
 export type Position = [
     id: string,
     city: string,

@@ -13,6 +13,7 @@ export default ({ route, darkMode }: { route: Route; darkMode?: boolean }) => {
             ]}
         >
             <RouteIcon
+                city={route[ERoute.city]}
                 type={route[ERoute.type]}
                 agency={route[ERoute.agency]}
                 color={halfTransparentText}

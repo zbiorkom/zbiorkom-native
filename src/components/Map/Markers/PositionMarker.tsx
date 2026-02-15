@@ -18,20 +18,17 @@ export default ({ position, showBrigade, showFleet, style }: Props) => {
     return (
         <View
             collapsable={false}
-            style={[
-                styles.vehicleContainer,
-                { backgroundColor: position[EPosition.route][ERoute.color] },
-                style,
-            ]}
+            style={[styles.container, { backgroundColor: position[EPosition.route][ERoute.color] }, style]}
         >
             <>
-                {position[EPosition.bearing] !== undefined && (
+                {position[EPosition.bearing] !== null && (
                     <View style={{ transform: [{ rotate: `${position[EPosition.bearing]}deg` }] }}>
                         <Icon source="arrow-up" size={16} color={halfTransparentText} />
                     </View>
                 )}
 
                 <RouteIcon
+                    city={position[EPosition.route][ERoute.city]}
                     type={position[EPosition.route][ERoute.type]}
                     agency={position[EPosition.route][ERoute.agency]}
                     color={halfTransparentText}
@@ -50,7 +47,7 @@ export default ({ position, showBrigade, showFleet, style }: Props) => {
 };
 
 const styles = StyleSheet.create({
-    vehicleContainer: {
+    container: {
         alignSelf: "center",
         flexDirection: "row",
         alignItems: "center",

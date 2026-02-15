@@ -9,12 +9,14 @@ import useSettings from "~/hooks/useSettings";
 import StopSheetHeader from "./StopSheetHeader";
 import { useEffect } from "react";
 import { useMapNavigate } from "~/hooks/useMapView";
-import { EStop, Stop, StopDeparture } from "~/tools/typings";
+import { EStop, ETrip, EStopDeparture, Stop, StopDeparture } from "~/tools/typings";
 import { useEventQuery } from "~/hooks/useQuery";
 import StopSheetDeparture from "./StopSheetDeparture";
+import { useTheme } from "~/hooks/useTheme";
 
 export default ({ open }: { open: boolean }) => {
     const [stop, goBack] = useMapSheets(useShallow((state) => [state.stop, state.goBack]));
+    const { colorScheme, theme } = useTheme();
     const { useStopCode } = useSettings();
     const navigateTo = useMapNavigate();
 
@@ -28,51 +30,51 @@ export default ({ open }: { open: boolean }) => {
         stop?.[EStop.city],
         `stops/${stop?.[EStop.id]}/stream`,
         {
-            enabled: !!stop,
+            enabled: open && !!stop,
             resetDataOnKeyChange: true,
         },
     );
 
     if (!stop) return null;
 
-    const stopInfo = initialData || stop;
-
     return (
         <>
             <BottomSheet
                 open={open}
-                headerLeftComponent={<StopSheetHeader stop={stopInfo} />}
+                headerLeftComponent={<StopSheetHeader stop={stop} />}
                 headerActions={[
                     {
                         icon: "star-outline",
-                        onPress: () => {
-                            console.log("Pressed star outline");
-                        },
+                        onPress: () => {},
                     },
                     {
                         icon: "dots-vertical",
-                        onPress: () => {
-                            console.log("Pressed dots vertical");
-                        },
+                        onPress: () => {},
                     },
                 ]}
                 onClose={goBack}
             >
                 <BottomSheetVirtualizedList
                     data={data || []}
-                    keyExtractor={(i: number) => `dep${i}`}
+                    keyExtractor={(item: StopDeparture) =>
+                        `${item[EStopDeparture.trip][ETrip.id]}-${item[EStopDeparture.scheduledDeparture]}`
+                    }
                     getItemCount={(data: StopDeparture[]) => data.length}
                     getItem={(data: StopDeparture[], index: number) => data[index]}
                     renderItem={({ item }: { item: StopDeparture }) => (
-                        <StopSheetDeparture departure={item} />
+                        <StopSheetDeparture
+                            departure={item}
+                            theme={theme}
+                            darkMode={colorScheme === "dark"}
+                        />
                     )}
                 />
             </BottomSheet>
 
             {open && (
                 <Portal host="map">
-                    <MarkerView coordinate={stopInfo[EStop.location]} key={stopInfo[EStop.id]}>
-                        <StopMarker stop={stopInfo} useStopCode={useStopCode} />
+                    <MarkerView coordinate={stop[EStop.location]} key={stop[EStop.id]}>
+                        <StopMarker stop={stop} useStopCode={useStopCode} />
                     </MarkerView>
                 </Portal>
             )}

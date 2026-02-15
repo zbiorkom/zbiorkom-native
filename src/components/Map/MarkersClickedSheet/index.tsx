@@ -16,8 +16,8 @@ export default ({ open }: { open: boolean }) => {
     const { showBrigade, showFleet, useStopCode } = useSettings();
     const { theme, colorScheme } = useTheme();
     const { bottom } = useSafeAreaInsets();
-    const [markersClicked, setStop, goBack] = useMapSheets(
-        useShallow((state) => [state.markersClicked, state.setStop, state.goBack]),
+    const [markersClicked, setStop, setPosition, goBack] = useMapSheets(
+        useShallow((state) => [state.markersClicked, state.setStop, state.setPosition, state.goBack]),
     );
 
     if (!markersClicked) return null;
@@ -40,7 +40,7 @@ export default ({ open }: { open: boolean }) => {
                                 <TouchableRipple
                                     key={`marker-clicked-ripple-${index}`}
                                     borderless
-                                    onPress={() => console.log("Pressed vehicle marker ripple")}
+                                    onPress={() => setPosition(marker.position!)}
                                     style={[
                                         styles.button,
                                         styles.vehicleButton,

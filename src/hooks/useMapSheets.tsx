@@ -1,15 +1,19 @@
 import { create } from "zustand";
-import { Position, Stop } from "~/tools/typings";
+import { Position, Stop, Trip } from "~/tools/typings";
 
 export type MarkersClicked = { position?: Position; stop?: Stop }[];
-export type SheetType = "MarkersClicked" | "Stop";
+export type SheetType = "MarkersClicked" | "Stop" | "Trip";
 
 interface MapSheetsState {
     stack: SheetType[];
     markersClicked?: MarkersClicked;
     stop?: Stop;
+    position?: Position;
+    trip?: Trip;
     setMarkersClicked: (markers: MarkersClicked) => void;
     setStop: (stop: Stop) => void;
+    setPosition: (position: Position) => void;
+    setTrip: (trip: Trip) => void;
     goBack: () => void;
 }
 
@@ -22,6 +26,16 @@ export default create<MapSheetsState>((set) => {
         setStop: (stop: Stop) => {
             set(({ stack }) => ({ stop, stack: [...stack, "Stop"] }));
         },
-        goBack: () => set(({ stack }) => ({ stack: stack.slice(0, -1) })),
+        setPosition: (position: Position) => {
+            set(({ stack }) => ({ position, trip: undefined, stack: [...stack, "Trip"] }));
+        },
+        setTrip: (trip: Trip) => {
+            set(({ stack }) => ({ trip, position: undefined, stack: [...stack, "Trip"] }));
+        },
+        goBack: () => {
+            set(({ stack }) => ({
+                stack: stack.slice(0, -1).filter((sheet) => sheet !== "MarkersClicked"),
+            }));
+        },
     };
 });

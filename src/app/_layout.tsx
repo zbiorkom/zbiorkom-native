@@ -1,16 +1,19 @@
+import { ThemeProvider as NavThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { useLocationTracking } from "~/hooks/useUserLocation";
+import { ThemeProvider, useTheme } from "~/hooks/useTheme";
 import { BackendProvider } from "~/hooks/useBackend";
 import * as SplashScreen from "expo-splash-screen";
-import { ThemeProvider, useTheme } from "~/hooks/useTheme";
 import { Stack } from "expo-router";
-import { ThemeProvider as NavThemeProvider, DarkTheme, DefaultTheme } from "@react-navigation/native";
 
 import "../translations/i18n";
 
 SplashScreen.preventAutoHideAsync();
 
 export default () => {
+    useLocationTracking();
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <ThemeProvider>

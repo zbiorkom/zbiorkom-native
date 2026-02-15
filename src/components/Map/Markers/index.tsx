@@ -1,7 +1,7 @@
 import { useEventQuery } from "~/hooks/useQuery";
 import useMapView from "~/hooks/useMapView";
 import { useShallow } from "zustand/shallow";
-import VehicleMarker from "./PositionMarker";
+import PositionMarker from "./PositionMarker";
 import DotPositions from "./DotPositions";
 import { Portal } from "~/hooks/Portal";
 import InteractiveMarkers from "./InteractiveMarkers";
@@ -34,7 +34,7 @@ export default () => {
 
             {data?.positions?.map((position) => (
                 <AnimatedMarker coordinate={position[EPosition.location]} key={position[EPosition.id]}>
-                    <VehicleMarker position={position} showBrigade={showBrigade} showFleet={showFleet} />
+                    <PositionMarker position={position} showBrigade={showBrigade} showFleet={showFleet} />
                 </AnimatedMarker>
             ))}
 

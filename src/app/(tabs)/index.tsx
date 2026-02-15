@@ -14,8 +14,8 @@ import { useCity } from "~/hooks/useBackend";
 const pixelRatio = Platform.OS === "android" ? PixelRatio.get() : 1;
 
 export default () => {
-    const [setMarkersClicked, setStop] = useMapSheets(
-        useShallow((state) => [state.setMarkersClicked, state.setStop])
+    const [setMarkersClicked, setStop, setPosition] = useMapSheets(
+        useShallow((state) => [state.setMarkersClicked, state.setStop, state.setPosition]),
     );
     const [city] = useCity();
     const { colorScheme } = useTheme();
@@ -45,7 +45,7 @@ export default () => {
                 const features = await mapRef.current?.queryRenderedFeaturesAtPoint(
                     [locationX * pixelRatio, locationY * pixelRatio],
                     undefined,
-                    ["positions", "stops"]
+                    ["positions", "stops"],
                 );
 
                 if (!features?.features.length) return;
@@ -66,6 +66,7 @@ export default () => {
                     const { properties } = features.features[0];
 
                     if (properties?.type === "position") {
+                        setPosition(properties.position);
                     } else if (properties?.type === "stop") {
                         setStop(properties.stop);
                     }

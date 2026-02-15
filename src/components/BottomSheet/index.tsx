@@ -1,6 +1,6 @@
 import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useTheme } from "~/hooks/useTheme";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import useSystemBack from "~/hooks/useSystemBack";
 import BottomSheetHeader, { BottomSheetHeaderActions } from "./BottomSheetHeader";
 import { Dimensions } from "react-native";
@@ -16,17 +16,29 @@ type Props = {
 
 export default ({ open, backdrop, headerLeftComponent, headerActions, children, onClose }: Props) => {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
+    const isProgrammaticDismiss = useRef(false);
     const { theme } = useTheme();
 
     useEffect(() => {
         if (!bottomSheetRef.current) return;
 
         if (open) {
+            isProgrammaticDismiss.current = false;
             bottomSheetRef.current.present();
         } else {
-            bottomSheetRef.current.close();
+            isProgrammaticDismiss.current = true;
+            bottomSheetRef.current.dismiss();
         }
     }, [open, bottomSheetRef]);
+
+    const handleDismiss = useCallback(() => {
+        if (isProgrammaticDismiss.current) {
+            isProgrammaticDismiss.current = false;
+            return;
+        }
+
+        onClose?.();
+    }, [onClose]);
 
     useSystemBack(() => {
         bottomSheetRef.current?.close();
@@ -50,11 +62,7 @@ export default ({ open, backdrop, headerLeftComponent, headerActions, children, 
                     ? (props) => <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} />
                     : undefined
             }
-            onDismiss={onClose}
-            onAnimate={(fromIndex, toIndex) => {
-                if (fromIndex === 0 && toIndex === -1) {
-                }
-            }}
+            onDismiss={handleDismiss}
             snapPoints={["30%", "60%"]}
             maxDynamicContentSize={Dimensions.get("window").height * 0.6}
             children={children}

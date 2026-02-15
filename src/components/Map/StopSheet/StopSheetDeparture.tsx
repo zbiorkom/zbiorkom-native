@@ -1,19 +1,31 @@
 import DelayText from "@/ui/DelayText";
 import RouteChip from "@/ui/RouteChip";
 import { StyleSheet, View } from "react-native";
-import { Text, TouchableRipple } from "react-native-paper";
-import { useTheme } from "~/hooks/useTheme";
+import { MD3Theme, Text, TouchableRipple } from "react-native-paper";
+import { useShallow } from "zustand/shallow";
+import useMapSheets from "~/hooks/useMapSheets";
 import { EStopDeparture, ETrip, StopDeparture } from "~/tools/typings";
 
-export default ({ departure }: { departure: StopDeparture }) => {
-    const { colorScheme, theme } = useTheme();
-    const darkMode = colorScheme === "dark";
+type Props = {
+    departure: StopDeparture;
+    theme: MD3Theme;
+    darkMode: boolean;
+};
+
+export default ({ departure, theme, darkMode }: Props) => {
+    const [setPosition, setTrip] = useMapSheets(useShallow((state) => [state.setPosition, state.setTrip]));
 
     return (
         <TouchableRipple
             style={[styles.container, { backgroundColor: theme.colors.elevation.level3 }]}
             borderless
-            onPress={() => {}}
+            onPress={() => {
+                if (departure[EStopDeparture.position]) {
+                    setPosition(departure[EStopDeparture.position]!);
+                } else {
+                    setTrip(departure[EStopDeparture.trip]);
+                }
+            }}
         >
             <>
                 <View style={styles.header}>
