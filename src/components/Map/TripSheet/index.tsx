@@ -18,7 +18,7 @@ export default ({ open }: { open: boolean }) => {
         useShallow((state) => [state.position, state.trip, state.goBack]),
     );
 
-    const { data, initialData, isLoading, error } = useEventQuery<
+    const { data, initialData } = useEventQuery<
         {
             position?: Position;
             stops: [arrival: StopTime, departure: StopTime][];

@@ -16,7 +16,7 @@ export default () => {
     const [selectedDirection, setSelectedDirection] = useState(0);
     const [menuVisible, setMenuVisible] = useState(false);
 
-    const { data, isLoading, error } = useFetchQuery<RouteDetails>(city!.id, `routes/${route}`);
+    const { data, loadingState } = useFetchQuery<RouteDetails>(city!.id, `routes/${route}`);
 
     const directionOptions = useMemo(() => {
         if (!data) return [];
@@ -71,7 +71,7 @@ export default () => {
 
     return (
         <Container>
-            {isLoading && <ActivityIndicator animating size="large" style={{ flex: 1 }} />}
+            {!!loadingState?.loading && <ActivityIndicator animating size="large" style={{ flex: 1 }} />}
 
             {data?.graph[selectedDirection] && (
                 <RouteStopsList

@@ -13,5 +13,23 @@
         "late": "Opóźniony o {{time}}",
         "cancelled": "Odwołany",
         "unknown": "Brak danych o opóźnieniu"
+    },
+    "units": {
+        "seconds_one": "sekunda",
+        "seconds_few": "sekundy",
+        "seconds_many": "sekund",
+        "seconds_other": "sekundy",
+        "minutes_one": "minuta",
+        "minutes_few": "minuty",
+        "minutes_many": "minut",
+        "minutes_other": "minuty",
+        "hours_one": "godzina",
+        "hours_few": "godziny",
+        "hours_many": "godzin",
+        "hours_other": "godziny",
+        "now": "teraz"
+    },
+    "trips": {
+        "platform": "Peron {{platform}}"
     }
 }

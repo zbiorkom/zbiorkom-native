@@ -13,5 +13,17 @@
         "late": "{{time}} late",
         "cancelled": "Cancelled",
         "unknown": "No data about delay"
+    },
+    "units": {
+        "seconds_one": "second",
+        "seconds_other": "seconds",
+        "minutes_one": "minute",
+        "minutes_other": "minutes",
+        "hours_one": "hour",
+        "hours_other": "hours",
+        "now": "now"
+    },
+    "trips": {
+        "platform": "Platform {{platform}}"
     }
 }

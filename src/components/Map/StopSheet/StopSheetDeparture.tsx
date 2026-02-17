@@ -1,10 +1,11 @@
-import DelayText from "@/ui/DelayText";
+import Countdown from "@/ui/Countdown";
 import RouteChip from "@/ui/RouteChip";
+import StopTime from "@/ui/StopTime";
 import { StyleSheet, View } from "react-native";
 import { MD3Theme, Text, TouchableRipple } from "react-native-paper";
 import { useShallow } from "zustand/shallow";
 import useMapSheets from "~/hooks/useMapSheets";
-import { EStopDeparture, ETrip, StopDeparture } from "~/tools/typings";
+import { EStopDeparture, EStopTime, ETrip, StopDeparture } from "~/tools/typings";
 
 type Props = {
     departure: StopDeparture;
@@ -28,25 +29,24 @@ export default ({ departure, theme, darkMode }: Props) => {
             }}
         >
             <>
-                <View style={styles.header}>
-                    <RouteChip route={departure[EStopDeparture.trip][ETrip.route]} darkMode={darkMode} />
+                <View style={styles.content}>
+                    <View style={styles.header}>
+                        <RouteChip route={departure[EStopDeparture.trip][ETrip.route]} darkMode={darkMode} />
 
-                    <Text variant="titleSmall">{departure[EStopDeparture.trip][ETrip.headsign]}</Text>
+                        <Text variant="titleSmall" style={{ flex: 1 }} numberOfLines={1}>
+                            {departure[EStopDeparture.trip][ETrip.headsign]}
+                        </Text>
+                    </View>
+
+                    <StopTime stopTime={departure[EStopDeparture.stopTime]} darkMode={darkMode} />
                 </View>
-                <View style={styles.details}>
-                    <DelayText
-                        delay={departure[EStopDeparture.delay]}
-                        status={departure[EStopDeparture.status]}
-                        darkMode={darkMode}
-                    />
-                    <Text>·</Text>
-                    <Text>
-                        {new Date(departure[EStopDeparture.scheduledDeparture]).toLocaleTimeString("pl", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        })}
-                    </Text>
-                </View>
+
+                <Countdown
+                    timestamp={
+                        departure[EStopDeparture.stopTime][EStopTime.scheduledTime] +
+                        departure[EStopDeparture.stopTime][EStopTime.delay]
+                    }
+                />
             </>
         </TouchableRipple>
     );
@@ -54,19 +54,23 @@ export default ({ departure, theme, darkMode }: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        margin: 8,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginHorizontal: 8,
+        marginVertical: 4,
         padding: 12,
         borderRadius: 16,
+    },
+    content: {
+        flexDirection: "column",
         gap: 4,
+        flex: 1,
+        paddingRight: 8,
     },
     header: {
         flexDirection: "row",
         alignItems: "center",
         gap: 8,
-    },
-    details: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 4,
     },
 });

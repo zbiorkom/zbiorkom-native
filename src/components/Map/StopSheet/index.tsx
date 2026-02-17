@@ -7,12 +7,13 @@ import useMapSheets from "~/hooks/useMapSheets";
 import StopMarker from "../Markers/StopMarker";
 import useSettings from "~/hooks/useSettings";
 import StopSheetHeader from "./StopSheetHeader";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useMapNavigate } from "~/hooks/useMapView";
-import { EStop, ETrip, EStopDeparture, Stop, StopDeparture } from "~/tools/typings";
+import { EStop, ETrip, EStopDeparture, Stop, StopDeparture, EStopTime } from "~/tools/typings";
 import { useEventQuery } from "~/hooks/useQuery";
 import StopSheetDeparture from "./StopSheetDeparture";
 import { useTheme } from "~/hooks/useTheme";
+import LoadState from "@/ui/LoadState";
 
 export default ({ open }: { open: boolean }) => {
     const [stop, goBack] = useMapSheets(useShallow((state) => [state.stop, state.goBack]));
@@ -26,7 +27,7 @@ export default ({ open }: { open: boolean }) => {
         navigateTo(stop[EStop.location], 16);
     }, [open, stop]);
 
-    const { data, initialData, isLoading, error } = useEventQuery<StopDeparture[], Stop>(
+    const { data, loadingState } = useEventQuery<StopDeparture[], Stop>(
         stop?.[EStop.city],
         `stops/${stop?.[EStop.id]}/stream`,
         {
@@ -35,18 +36,22 @@ export default ({ open }: { open: boolean }) => {
         },
     );
 
+    const renderItem = useCallback(
+        ({ item }: { item: StopDeparture }) => (
+            <StopSheetDeparture departure={item} theme={theme} darkMode={colorScheme === "dark"} />
+        ),
+        [theme, colorScheme],
+    );
+
     if (!stop) return null;
 
     return (
         <>
             <BottomSheet
                 open={open}
+                dynamicSizing={false}
                 headerLeftComponent={<StopSheetHeader stop={stop} />}
                 headerActions={[
-                    {
-                        icon: "star-outline",
-                        onPress: () => {},
-                    },
                     {
                         icon: "dots-vertical",
                         onPress: () => {},
@@ -54,21 +59,24 @@ export default ({ open }: { open: boolean }) => {
                 ]}
                 onClose={goBack}
             >
-                <BottomSheetVirtualizedList
-                    data={data || []}
-                    keyExtractor={(item: StopDeparture) =>
-                        `${item[EStopDeparture.trip][ETrip.id]}-${item[EStopDeparture.scheduledDeparture]}`
-                    }
-                    getItemCount={(data: StopDeparture[]) => data.length}
-                    getItem={(data: StopDeparture[], index: number) => data[index]}
-                    renderItem={({ item }: { item: StopDeparture }) => (
-                        <StopSheetDeparture
-                            departure={item}
-                            theme={theme}
-                            darkMode={colorScheme === "dark"}
-                        />
-                    )}
-                />
+                {!!loadingState?.error || !!loadingState?.loading ? (
+                    <LoadState loadingState={loadingState} />
+                ) : (
+                    <BottomSheetVirtualizedList
+                        data={data || []}
+                        keyExtractor={(item: StopDeparture) =>
+                            `${item[EStopDeparture.trip][ETrip.id]}-${item[EStopDeparture.stopTime][EStopTime.scheduledTime]}`
+                        }
+                        getItemCount={(departures: StopDeparture[]) => departures.length}
+                        getItem={(departures: StopDeparture[], index: number) => departures[index]}
+                        renderItem={renderItem}
+                        initialNumToRender={8}
+                        maxToRenderPerBatch={8}
+                        updateCellsBatchingPeriod={16}
+                        windowSize={5}
+                        removeClippedSubviews
+                    />
+                )}
             </BottomSheet>
 
             {open && (

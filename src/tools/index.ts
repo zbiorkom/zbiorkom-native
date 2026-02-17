@@ -59,3 +59,10 @@ export const polylineToGeoJson = (polyline: string) => {
 
     return geoJson;
 };
+
+export const getTimeString = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString("pl", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};

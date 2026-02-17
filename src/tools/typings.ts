@@ -153,22 +153,12 @@ export enum EDotPosition {
     location,
 }
 
-export type StopDeparture = [
-    trip: Trip,
-    position: Position | undefined,
-    scheduledDeparture: number,
-    delay: number | undefined,
-    status: StopDepartureStatus,
-    platform: string | undefined,
-];
+export type StopDeparture = [trip: Trip, position: Position | undefined, stopTime: StopTime];
 
 export enum EStopDeparture {
     trip,
     position,
-    scheduledDeparture,
-    delay,
-    status,
-    platform,
+    stopTime,
 }
 
 export interface RouteDetails {
@@ -216,4 +206,12 @@ export enum StopDepartureStatus {
     OnTrip,
     OnPreviousTrip,
     Cancelled,
+}
+
+export enum TrafficCongestion {
+    Unknown,
+    Normal,
+    Heavy,
+    Severe,
+    Stuck,
 }

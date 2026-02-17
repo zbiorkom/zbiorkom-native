@@ -8,13 +8,22 @@ import { Dimensions } from "react-native";
 type Props = {
     open: boolean;
     backdrop?: boolean;
+    dynamicSizing?: boolean;
     headerLeftComponent?: React.ReactNode;
     headerActions?: BottomSheetHeaderActions;
     children: React.ReactNode;
     onClose?: () => void;
 };
 
-export default ({ open, backdrop, headerLeftComponent, headerActions, children, onClose }: Props) => {
+export default ({
+    open,
+    backdrop,
+    dynamicSizing = true,
+    headerLeftComponent,
+    headerActions,
+    children,
+    onClose,
+}: Props) => {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const isProgrammaticDismiss = useRef(false);
     const { theme } = useTheme();
@@ -50,7 +59,7 @@ export default ({ open, backdrop, headerLeftComponent, headerActions, children, 
         <BottomSheetModal
             index={0}
             ref={bottomSheetRef}
-            enableDynamicSizing
+            enableDynamicSizing={dynamicSizing}
             enablePanDownToClose
             backgroundStyle={{ backgroundColor: theme.colors.surface }}
             handleIndicatorStyle={{ backgroundColor: theme.colors.onSurfaceVariant }}

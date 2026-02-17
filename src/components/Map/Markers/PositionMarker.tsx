@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
         color: halfTransparentText,
         fontSize: 14,
         marginLeft: 1,
+        marginTop: -2,
     },
     detailsText: {
         fontSize: 10,

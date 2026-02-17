@@ -2,10 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import EventSource from "react-native-sse";
 import { apiBase } from "~/tools/constants";
 
+export type LoadingState = {
+    loading?: boolean;
+    error?: string;
+};
+
 type FetchQueryResult<T> = {
     data: T | undefined;
-    isLoading: boolean;
-    error?: string;
+    loadingState?: LoadingState;
 };
 
 export function useFetchQuery<T = any>(
@@ -50,7 +54,10 @@ export function useFetchQuery<T = any>(
         fetchData();
     }, [city, endpoint, enabled, data]);
 
-    return { data, isLoading, error };
+    return {
+        data,
+        loadingState: isLoading || error ? { loading: isLoading || undefined, error } : undefined,
+    };
 }
 type EventQueryOptions = {
     enabled?: boolean;
@@ -60,8 +67,7 @@ type EventQueryOptions = {
 type EventQueryResult<T, I> = {
     data: T | undefined;
     initialData: I | undefined;
-    isLoading: boolean;
-    error?: string;
+    loadingState?: LoadingState;
 };
 
 export function useEventQuery<T = any, I = T>(
@@ -175,7 +181,6 @@ export function useEventQuery<T = any, I = T>(
     return {
         data,
         initialData,
-        isLoading,
-        error,
+        loadingState: isLoading || error ? { loading: isLoading || undefined, error } : undefined,
     };
 }

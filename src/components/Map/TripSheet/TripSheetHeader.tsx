@@ -13,7 +13,7 @@ export default ({ trip }: { trip?: Trip }) => {
         <View style={styles.container}>
             <RouteChip route={trip[ETrip.route]} darkMode={colorScheme === "dark"} />
 
-            <Text variant="titleMedium" numberOfLines={1}>
+            <Text variant="titleMedium" style={{ flex: 1 }} numberOfLines={1}>
                 {trip[ETrip.headsign]}
             </Text>
         </View>

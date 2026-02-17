@@ -38,5 +38,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: halfTransparentText,
         fontSize: 16,
+        marginTop: -2,
     },
 });
