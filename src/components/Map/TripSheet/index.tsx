@@ -3,14 +3,14 @@ import { useShallow } from "zustand/shallow";
 import { Portal } from "~/hooks/Portal";
 import useMapSheets from "~/hooks/useMapSheets";
 import { useEventQuery } from "~/hooks/useQuery";
-import { EPosition, ERoute, ETrip, Itinerary, Position, StopTime, Trip } from "~/tools/typings";
+import { EPosition, ERoute, ETrip, Itinerary, Position, Trip, TripStopTime } from "~/tools/typings";
 import AnimatedMarker from "../Markers/AnimatedMarker";
 import PositionMarker from "../Markers/PositionMarker";
 import useSettings from "~/hooks/useSettings";
-import { BottomSheetView } from "@gorhom/bottom-sheet";
-import { Text } from "react-native-paper";
 import TripItinerary from "../TripItinerary";
 import TripSheetHeader from "./TripSheetHeader";
+import LoadingState from "@/ui/LoadingState";
+import TripSheetContent from "./TripSheetContent";
 
 export default ({ open }: { open: boolean }) => {
     const { showBrigade, showFleet } = useSettings();
@@ -18,11 +18,8 @@ export default ({ open }: { open: boolean }) => {
         useShallow((state) => [state.position, state.trip, state.goBack]),
     );
 
-    const { data, initialData } = useEventQuery<
-        {
-            position?: Position;
-            stops: [arrival: StopTime, departure: StopTime][];
-        },
+    const { data, initialData, loadingState } = useEventQuery<
+        { position?: Position; stops: TripStopTime[]; sequence: number },
         { trip: Trip; itinerary: Itinerary }
     >(
         position?.[EPosition.city] || trip?.[ETrip.city],
@@ -48,9 +45,15 @@ export default ({ open }: { open: boolean }) => {
                 ]}
                 onClose={goBack}
             >
-                <BottomSheetView>
-                    <Text>Position: {data?.position?.[EPosition.id]}</Text>
-                </BottomSheetView>
+                <LoadingState loadingState={loadingState} />
+
+                <TripSheetContent
+                    trip={initialData?.trip}
+                    itinerary={initialData?.itinerary}
+                    stopTimes={data?.stops}
+                    position={data?.position}
+                    sequence={data?.sequence}
+                />
             </BottomSheet>
 
             {open && (

@@ -27,7 +27,10 @@ export enum VehicleType {
     Train = 2,
     Bus = 3,
     Ferry = 4,
+    AerialLift = 6,
+    Funicular = 7,
     Trolleybus = 11,
+    Monorail = 12,
 }
 
 export type Route = [
@@ -159,6 +162,13 @@ export enum EStopDeparture {
     trip,
     position,
     stopTime,
+}
+
+export type TripStopTime = [arrival: StopTime, departure: StopTime];
+
+export enum ETripStopTime {
+    arrival,
+    departure,
 }
 
 export interface RouteDetails {

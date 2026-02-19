@@ -31,7 +31,7 @@ export default ({ timestamp, showSeconds = false }: Props) => {
     if (timeLeft < 15000) {
         return (
             <View style={styles.container}>
-                <Text variant="headlineSmall">{t("now")}</Text>
+                <Text variant="labelLarge" style={styles.counter}>{t("now")}</Text>
             </View>
         );
     }
@@ -61,13 +61,17 @@ export default ({ timestamp, showSeconds = false }: Props) => {
 
     return (
         <View style={styles.container}>
-            <Text variant="headlineSmall">{valueToDisplay}</Text>
+            <Text variant="labelLarge" style={styles.counter}>{valueToDisplay}</Text>
             <Text variant="labelSmall">{t(unitKey, { count: valueToDisplay })}</Text>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    counter: {
+        fontSize: 20,
+        fontWeight: "bold"
+    },
     container: {
         alignItems: "flex-end",
         justifyContent: "center",

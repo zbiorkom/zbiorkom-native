@@ -11,21 +11,21 @@ type Props = {
 };
 
 export default ({ stopTime, darkMode }: Props) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(["punctuality", "trips"]);
 
     const [color, text, hasDelay] = useMemo(() => {
         if (stopTime[EStopTime.status] === StopDepartureStatus.Cancelled) {
-            return [darkMode ? "#e1bee7" : "#4a148c", t("punctuality.cancelled"), true];
+            return [darkMode ? "#e1bee7" : "#4a148c", t("cancelled"), true];
         }
 
         if (stopTime[EStopTime.status] === StopDepartureStatus.Scheduled) {
-            return [darkMode ? "#cfd8dc" : "#455a64", t("punctuality.unknown")];
+            return [darkMode ? "#cfd8dc" : "#455a64", t("unknown")];
         }
 
         if (stopTime[EStopTime.delay] && stopTime[EStopTime.delay]! >= 60000) {
             return [
                 darkMode ? "#ff8a80" : "#b71c1c",
-                t("punctuality.late", { time: msToTime(stopTime[EStopTime.delay]!) }),
+                t("late", { time: msToTime(stopTime[EStopTime.delay]!) }),
                 true,
             ];
         }
@@ -33,12 +33,12 @@ export default ({ stopTime, darkMode }: Props) => {
         if (stopTime[EStopTime.delay] && stopTime[EStopTime.delay]! <= -60000) {
             return [
                 darkMode ? "#ffe082" : "#d84315",
-                t("punctuality.early", { time: msToTime(-stopTime[EStopTime.delay]!) }),
+                t("early", { time: msToTime(-stopTime[EStopTime.delay]!) }),
                 true,
             ];
         }
 
-        return [darkMode ? "#c5e1a5" : "#1b5e20", t("punctuality.onTime")];
+        return [darkMode ? "#c5e1a5" : "#1b5e20", t("onTime")];
     }, [stopTime]);
 
     return (
@@ -63,7 +63,7 @@ export default ({ stopTime, darkMode }: Props) => {
 
             {stopTime[EStopTime.platform] && (
                 <Text variant="labelMedium">
-                    · {t("trips.platform", { platform: stopTime[EStopTime.platform] })}
+                    · {t("platform", { platform: stopTime[EStopTime.platform], ns: "trips" })}
                 </Text>
             )}
         </View>
@@ -78,8 +78,5 @@ const styles = StyleSheet.create({
     },
     strikethrough: {
         textDecorationLine: "line-through",
-        textShadowColor: "#000",
-        textShadowOffset: { width: 0, height: 0 },
-        textShadowRadius: 1,
     },
 });

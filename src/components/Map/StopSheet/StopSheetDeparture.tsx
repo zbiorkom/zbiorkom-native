@@ -2,19 +2,16 @@ import Countdown from "@/ui/Countdown";
 import RouteChip from "@/ui/RouteChip";
 import StopTime from "@/ui/StopTime";
 import { StyleSheet, View } from "react-native";
-import { MD3Theme, Text, TouchableRipple } from "react-native-paper";
+import { Text, TouchableRipple } from "react-native-paper";
 import { useShallow } from "zustand/shallow";
 import useMapSheets from "~/hooks/useMapSheets";
+import { useTheme } from "~/hooks/useTheme";
 import { EStopDeparture, EStopTime, ETrip, StopDeparture } from "~/tools/typings";
 
-type Props = {
-    departure: StopDeparture;
-    theme: MD3Theme;
-    darkMode: boolean;
-};
-
-export default ({ departure, theme, darkMode }: Props) => {
+export default ({ departure }: { departure: StopDeparture }) => {
     const [setPosition, setTrip] = useMapSheets(useShallow((state) => [state.setPosition, state.setTrip]));
+    const { theme, colorScheme } = useTheme();
+    const darkMode = colorScheme === "dark";
 
     return (
         <TouchableRipple
@@ -57,7 +54,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginHorizontal: 8,
         marginVertical: 4,
         padding: 12,
         borderRadius: 16,

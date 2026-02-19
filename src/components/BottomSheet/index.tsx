@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import useSystemBack from "~/hooks/useSystemBack";
 import BottomSheetHeader, { BottomSheetHeaderActions } from "./BottomSheetHeader";
 import { Dimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
     open: boolean;
@@ -77,4 +78,14 @@ export default ({
             children={children}
         />
     );
+};
+
+export const useBottomSheetPadding = () => {
+    const { bottom } = useSafeAreaInsets();
+
+    return {
+        paddingTop: 8,
+        paddingBottom: bottom,
+        paddingHorizontal: 8,
+    };
 };

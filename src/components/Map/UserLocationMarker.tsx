@@ -1,7 +1,9 @@
 import { MarkerView } from "@maplibre/maplibre-react-native";
 import { View, Text, StyleSheet } from "react-native";
 import Svg, { Path, Defs, RadialGradient, Stop } from "react-native-svg";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { useUserLocationData } from "~/hooks/useUserLocation";
+import { useEffect } from "react";
 
 const DOT_SIZE = 20;
 const HEADING_SIZE = DOT_SIZE * 5;
@@ -32,6 +34,32 @@ const HeadingCone = () => (
     </Svg>
 );
 
+const AnimatedHeading = ({ heading }: { heading: number }) => {
+    const rotation = useSharedValue(heading);
+
+    useEffect(() => {
+        const currentRotation = rotation.value;
+        let diff = (heading - currentRotation) % 360;
+
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+
+        rotation.value = withTiming(currentRotation + diff, { duration: 500 });
+    }, [heading]);
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ rotate: `${rotation.value}deg` }],
+        };
+    });
+
+    return (
+        <Animated.View style={[styles.heading, animatedStyle]}>
+            <HeadingCone />
+        </Animated.View>
+    );
+};
+
 export default ({ emoji }: { emoji?: string }) => {
     const { location, heading } = useUserLocationData();
     if (!location) return null;
@@ -39,17 +67,9 @@ export default ({ emoji }: { emoji?: string }) => {
     return (
         <MarkerView coordinate={[location.coords.longitude, location.coords.latitude]}>
             <View style={styles.container} collapsable={false} pointerEvents="none">
-                {heading !== null && (
-                    <View style={[styles.heading, { transform: [{ rotate: `${heading}deg` }] }]}>
-                        <HeadingCone />
-                    </View>
-                )}
+                {heading !== null && <AnimatedHeading heading={heading} />}
 
-                {emoji ? (
-                    <Text style={styles.emoji}>{emoji}</Text>
-                ) : (
-                    <View style={styles.dot} />
-                )}
+                {emoji ? <Text style={styles.emoji}>{emoji}</Text> : <View style={styles.dot} />}
             </View>
         </MarkerView>
     );

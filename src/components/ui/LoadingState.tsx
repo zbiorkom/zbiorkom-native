@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Icon, Text } from "react-native-paper";
 import { StyleSheet, View } from "react-native";
 import { useTheme } from "~/hooks/useTheme";
-import { LoadingState } from "~/hooks/useQuery";
+import { QueryLoadingState } from "~/hooks/useQuery";
 
-const loadingDelayMs = 75;
+const loadingDelayMs = 70;
 
-export default ({ loadingState: { loading, error } = {} }: { loadingState?: LoadingState }) => {
+export default ({ loadingState: { loading, error } = {} }: { loadingState?: QueryLoadingState }) => {
     const { theme } = useTheme();
     const [showLoading, setShowLoading] = useState(false);
 

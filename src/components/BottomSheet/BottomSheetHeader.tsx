@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
     },
     leftComponent: {
+        flex: 1,
         paddingVertical: 6,
     },
     actionButtons: {

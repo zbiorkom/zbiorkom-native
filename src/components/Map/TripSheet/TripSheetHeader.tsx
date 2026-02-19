@@ -13,7 +13,7 @@ export default ({ trip }: { trip?: Trip }) => {
         <View style={styles.container}>
             <RouteChip route={trip[ETrip.route]} darkMode={colorScheme === "dark"} />
 
-            <Text variant="titleMedium" style={{ flex: 1 }} numberOfLines={1}>
+            <Text variant="titleMedium" style={styles.headsign} numberOfLines={1}>
                 {trip[ETrip.headsign]}
             </Text>
         </View>
@@ -24,6 +24,10 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         alignItems: "center",
+        flex: 1,
         gap: 8,
+    },
+    headsign: {
+        flex: 1,
     },
 });

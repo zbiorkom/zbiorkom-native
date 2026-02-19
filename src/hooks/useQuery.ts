@@ -2,14 +2,14 @@ import { useState, useEffect, useRef } from "react";
 import EventSource from "react-native-sse";
 import { apiBase } from "~/tools/constants";
 
-export type LoadingState = {
+export type QueryLoadingState = {
     loading?: boolean;
     error?: string;
 };
 
 type FetchQueryResult<T> = {
     data: T | undefined;
-    loadingState?: LoadingState;
+    loadingState?: QueryLoadingState;
 };
 
 export function useFetchQuery<T = any>(
@@ -67,7 +67,7 @@ type EventQueryOptions = {
 type EventQueryResult<T, I> = {
     data: T | undefined;
     initialData: I | undefined;
-    loadingState?: LoadingState;
+    loadingState?: QueryLoadingState;
 };
 
 export function useEventQuery<T = any, I = T>(
@@ -142,7 +142,7 @@ export function useEventQuery<T = any, I = T>(
         });
 
         es.addEventListener("errorCode", (event) => {
-            setError(event.data!);
+            setError(JSON.parse(event.data!));
             setIsLoading(false);
             es.close();
         });
