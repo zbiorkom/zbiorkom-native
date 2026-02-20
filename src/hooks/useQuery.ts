@@ -79,6 +79,7 @@ export function useEventQuery<T = any, I = T>(
     const [initialData, setInitialData] = useState<I>();
     const [isLoading, setIsLoading] = useState<boolean>(enabled);
     const [error, setError] = useState<string>();
+    const [retryCount, setRetryCount] = useState(0);
 
     const esRef = useRef<EventSource | null>(null);
     const prevEsRef = useRef<EventSource | null>(null);
@@ -147,9 +148,14 @@ export function useEventQuery<T = any, I = T>(
             es.close();
         });
 
-        es.addEventListener("error", (event) => {
-            setError("NETWORK_ERROR");
-            setIsLoading(false);
+        es.addEventListener("error", () => {
+            if (retryCount < 1) {
+                setRetryCount((prev) => prev + 1);
+            } else {
+                setError("NETWORK_ERROR");
+                setIsLoading(false);
+            }
+
             es.close();
         });
 
@@ -176,11 +182,11 @@ export function useEventQuery<T = any, I = T>(
             esRef.current = null;
             keyRef.current = null;
         };
-    }, [city, endpoint, enabled]);
+    }, [city, endpoint, enabled, retryCount]);
 
     return {
-        data,
-        initialData,
+        data: error ? undefined : data,
+        initialData: error ? undefined : initialData,
         loadingState: isLoading || error ? { loading: isLoading || undefined, error } : undefined,
     };
 }
