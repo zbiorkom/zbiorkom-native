@@ -13,7 +13,7 @@ type Props = {
     headerLeftComponent?: React.ReactNode;
     headerActions?: BottomSheetHeaderActions;
     children: React.ReactNode;
-    onClose?: () => void;
+    onClose?: (isSwipeDown?: boolean) => void;
 };
 
 export default ({
@@ -47,11 +47,11 @@ export default ({
             return;
         }
 
-        onClose?.();
+        onClose?.(true);
     }, [onClose]);
 
     useSystemBack(() => {
-        bottomSheetRef.current?.close();
+        onClose?.(false);
 
         return true;
     }, open);

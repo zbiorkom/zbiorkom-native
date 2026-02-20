@@ -14,7 +14,7 @@ interface MapSheetsState {
     setStop: (stop: Stop) => void;
     setPosition: (position: Position) => void;
     setTrip: (trip: Trip) => void;
-    goBack: () => void;
+    goBack: (reset?: boolean) => void;
 }
 
 export default create<MapSheetsState>((set) => {
@@ -32,9 +32,9 @@ export default create<MapSheetsState>((set) => {
         setTrip: (trip: Trip) => {
             set(({ stack }) => ({ trip, position: undefined, stack: [...stack, "Trip"] }));
         },
-        goBack: () => {
+        goBack: (reset?: boolean) => {
             set(({ stack }) => ({
-                stack: stack.slice(0, -1).filter((sheet) => sheet !== "MarkersClicked"),
+                stack: reset ? [] : stack.slice(0, -1),
             }));
         },
     };
