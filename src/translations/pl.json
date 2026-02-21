@@ -31,5 +31,12 @@
     },
     "trips": {
         "platform": "Peron {{platform}}"
+    },
+    "welcome": {
+        "title": "Witaj na <bold>zbiorkom.live</bold>!",
+        "location_request": "Zezwól na dostęp do lokalizacji, aby przyspieszyć wybór miasta.",
+        "grant_location": "Udostępnij lokalizację",
+        "search_city": "Znajdź miasto",
+        "select_city": "Wybierz miasto"
     }
 }

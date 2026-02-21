@@ -44,6 +44,8 @@ const AppContent = () => {
         >
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="(tabs)" />
+                <Stack.Screen name="welcome" />
+                <Stack.Screen name="cityPicker" />
             </Stack>
         </NavThemeProvider>
     );

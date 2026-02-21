@@ -25,5 +25,12 @@
     },
     "trips": {
         "platform": "Platform {{platform}}"
+    },
+    "welcome": {
+        "title": "Welcome to <bold>zbiorkom.live</bold>!",
+        "location_request": "Allow location access to speed up city selection.",
+        "grant_location": "Grant location access",
+        "search_city": "Find a city",
+        "select_city": "Select city"
     }
 }

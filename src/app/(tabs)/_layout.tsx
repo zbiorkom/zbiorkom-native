@@ -1,8 +1,15 @@
 import BottomBar from "@/ui/BottomBar";
 import { Icon } from "react-native-paper";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
+import { useSettingsStore } from "~/hooks/useSettings";
 
 export default () => {
+    const currentCity = useSettingsStore((state) => state.currentCity);
+
+    if (!currentCity) {
+        return <Redirect href="/welcome" />;
+    }
+
     return (
         <Tabs
             screenOptions={{
