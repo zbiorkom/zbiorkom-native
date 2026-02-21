@@ -2,6 +2,7 @@ import { BottomSheetVirtualizedList } from "@gorhom/bottom-sheet";
 import { useCallback } from "react";
 import {
     EItinerary,
+    EPosition,
     ERoute,
     ETrip,
     Itinerary,
@@ -31,11 +32,13 @@ export default ({ trip, itinerary, stopTimes, position, sequence }: Props) => {
                 index={index}
                 stop={item}
                 stopTime={stopTimes?.[index]}
-                color={trip?.[ETrip.route][ERoute.color]}
+                route={trip?.[ETrip.route]!}
                 totalStops={itineraryStops.length}
+                sequence={sequence}
+                percentTraveled={position?.[EPosition.percentTraveled]}
             />
         ),
-        [stopTimes, itineraryStops],
+        [stopTimes, itineraryStops, sequence, position],
     );
 
     return (

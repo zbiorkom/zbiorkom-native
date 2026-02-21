@@ -6,12 +6,7 @@ import { darkFilter, halfTransparentText } from "~/tools/constants";
 
 export default ({ route, darkMode }: { route: Route; darkMode?: boolean }) => {
     return (
-        <View
-            style={[
-                styles.container,
-                { backgroundColor: route[ERoute.color], filter: darkMode ? darkFilter : undefined },
-            ]}
-        >
+        <View style={[styles.container, { backgroundColor: route[ERoute.color] }, darkMode && darkFilter]}>
             <RouteIcon
                 city={route[ERoute.city]}
                 type={route[ERoute.type]}

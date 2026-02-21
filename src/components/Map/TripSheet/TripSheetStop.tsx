@@ -7,25 +7,30 @@ import { useTheme } from "~/hooks/useTheme";
 import { darkFilter } from "~/tools/constants";
 import {
     EItineraryStop,
+    ERoute,
     EStop,
     EStopTime,
     ETripStopTime,
     ItineraryStop,
+    Route,
     TripStopTime,
+    VehicleType,
 } from "~/tools/typings";
+import TripSheetVehicleIndicator from "./TripSheetVehicleIndicator";
 
 type Props = {
     index: number;
     stop: ItineraryStop;
     stopTime?: TripStopTime;
-    color?: string;
+    route: Route;
     totalStops: number;
+    sequence?: number;
+    percentTraveled?: number;
 };
 
-export default ({ index, stop, stopTime, color, totalStops }: Props) => {
+export default ({ index, stop, stopTime, route, totalStops, sequence, percentTraveled }: Props) => {
     const { theme, colorScheme } = useTheme();
     const darkMode = colorScheme === "dark";
-    const colorFilter = darkMode ? darkFilter : undefined;
 
     const isFirst = index === 0;
     const isLast = index === totalStops - 1;
@@ -49,21 +54,26 @@ export default ({ index, stop, stopTime, color, totalStops }: Props) => {
                 <View
                     style={[
                         styles.lineSegment,
-                        !isFirst && { backgroundColor: color, filter: colorFilter },
+                        !isFirst && { backgroundColor: route[ERoute.color] },
+                        darkMode && darkFilter,
                     ]}
                 />
-                <View
-                    style={[
-                        styles.dot,
-                        { borderColor: color, filter: colorFilter },
-                    ]}
-                />
+                <View style={[styles.dot, { borderColor: route[ERoute.color] }, darkMode && darkFilter]} />
                 <View
                     style={[
                         styles.lineSegment,
-                        !isLast && { backgroundColor: color, filter: colorFilter },
+                        !isLast && { backgroundColor: route[ERoute.color] },
+                        darkMode && darkFilter,
                     ]}
                 />
+
+                {sequence === index + 1 && percentTraveled !== undefined && (
+                    <TripSheetVehicleIndicator
+                        percentTraveled={percentTraveled}
+                        route={route}
+                        darkMode={darkMode}
+                    />
+                )}
             </View>
 
             <TouchableRipple

@@ -17,8 +17,8 @@ export default ({ stop }: { stop: Stop }) => {
                         width={40}
                         height={40}
                         viewBox="0 0 40 40"
-                        filter={colorScheme === "dark" ? darkFilter : undefined}
-                        style={index !== 0 && styles.secondVehicleType}
+                        filter={colorScheme === "dark" ? darkFilter.filter : undefined}
+                        style={[index !== 0 && styles.secondVehicleType]}
                         key={`icon-${index}`}
                     >
                         <Path

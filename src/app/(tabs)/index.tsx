@@ -74,10 +74,7 @@ export default () => {
             }}
         >
             <MapView
-                style={{
-                    flex: 1,
-                    filter: colorScheme === "dark" ? darkFilter : undefined,
-                }}
+                style={[{ flex: 1 }, colorScheme === "dark" && darkFilter]}
                 mapStyle={Object.assign(mapStyle, { center: city?.location, zoom: 15 })}
                 attributionEnabled={false}
                 onRegionDidChange={({ properties }) => {

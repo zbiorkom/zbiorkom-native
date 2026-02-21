@@ -41,7 +41,7 @@ export default ({ open }: { open: boolean }) => {
                                     position={marker.position}
                                     showBrigade={showBrigade}
                                     showFleet={showFleet}
-                                    style={colorScheme === "dark" ? { filter: darkFilter } : {}}
+                                    style={colorScheme === "dark" && darkFilter}
                                 />
                             </TouchableRipple>
                         );
@@ -62,10 +62,7 @@ export default ({ open }: { open: boolean }) => {
                                         <StopMarker
                                             stop={marker.stop!}
                                             useStopCode={useStopCode}
-                                            style={[
-                                                style,
-                                                colorScheme === "dark" ? { filter: darkFilter } : {},
-                                            ]}
+                                            style={[style, colorScheme === "dark" && darkFilter]}
                                         />
                                     )}
                                     title={`${marker.stop[EStop.name]} ${marker.stop[EStop.code] || ""}`}

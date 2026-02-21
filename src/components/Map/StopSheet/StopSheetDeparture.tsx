@@ -6,7 +6,7 @@ import { Text, TouchableRipple } from "react-native-paper";
 import { useShallow } from "zustand/shallow";
 import useMapSheets from "~/hooks/useMapSheets";
 import { useTheme } from "~/hooks/useTheme";
-import { EStopDeparture, EStopTime, ETrip, StopDeparture } from "~/tools/typings";
+import { EStopDeparture, EStopTime, ETrip, StopDeparture, StopDepartureStatus } from "~/tools/typings";
 
 export default ({ departure }: { departure: StopDeparture }) => {
     const [setPosition, setTrip] = useMapSheets(useShallow((state) => [state.setPosition, state.setTrip]));
@@ -18,7 +18,10 @@ export default ({ departure }: { departure: StopDeparture }) => {
             style={[styles.container, { backgroundColor: theme.colors.elevation.level3 }]}
             borderless
             onPress={() => {
-                if (departure[EStopDeparture.position]) {
+                if (
+                    departure[EStopDeparture.position] &&
+                    departure[EStopDeparture.stopTime][EStopTime.status] === StopDepartureStatus.OnTrip
+                ) {
                     setPosition(departure[EStopDeparture.position]!);
                 } else {
                     setTrip(departure[EStopDeparture.trip]);

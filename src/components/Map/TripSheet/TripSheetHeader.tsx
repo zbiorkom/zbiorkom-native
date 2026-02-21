@@ -14,7 +14,7 @@ export default ({ trip }: { trip?: Trip }) => {
             <RouteChip route={trip[ETrip.route]} darkMode={colorScheme === "dark"} />
 
             <Text variant="titleMedium" style={styles.headsign} numberOfLines={1}>
-                {trip[ETrip.headsign]}
+                {`${trip[ETrip.shortName]} ${trip[ETrip.headsign]}`.trim()}
             </Text>
         </View>
     );

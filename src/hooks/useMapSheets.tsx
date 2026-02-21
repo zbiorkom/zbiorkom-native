@@ -34,7 +34,7 @@ export default create<MapSheetsState>((set) => {
         },
         goBack: (reset?: boolean) => {
             set(({ stack }) => ({
-                stack: reset ? [] : stack.slice(0, -1),
+                stack: reset ? [] : stack.slice(0, -1).filter((s) => s !== "MarkersClicked"),
             }));
         },
     };
