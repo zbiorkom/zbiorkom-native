@@ -13,7 +13,10 @@ export default () => {
     const { top, bottom, left, right } = useSafeAreaInsets();
     const isFocused = useIsFocused();
     const [city] = useCity();
-    const { data } = useFetchQuery<Route[]>(city.id, "routes", isFocused);
+    const { data } = useFetchQuery<Route[]>(city.id, "routes", {
+        enabled: isFocused,
+        resetDataOnKeyChange: true,
+    });
 
     const [filteredData, setFilteredData] = useState<Route[]>([]);
     const [isAtTop, setIsAtTop] = useState(true);

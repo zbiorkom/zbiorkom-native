@@ -62,7 +62,7 @@ export type Stop = [
     vehicleTypes: VehicleType[],
     bearing: number | undefined,
     direction: string | undefined,
-    routes: number[],
+    routes: Route[],
 ];
 
 export enum EStop {
@@ -169,6 +169,16 @@ export type TripStopTime = [arrival: StopTime, departure: StopTime];
 export enum ETripStopTime {
     arrival,
     departure,
+}
+
+export type StopTimetable = Record<string, StopTimetableDeparture[]>;
+
+export type StopTimetableDeparture = [tripIdx: number, timestamp: number, alight: number];
+
+export enum EStopTimetableDeparture {
+    tripIdx,
+    timestamp,
+    alight,
 }
 
 export interface RouteDetails {

@@ -1,7 +1,7 @@
 import { StyleSheet, View, LayoutChangeEvent, ViewStyle, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, IconButton } from "react-native-paper";
-import { ReactNode, useState } from "react";
+import { ReactNode, useMemo, useRef, useState } from "react";
 import { useTheme } from "../../hooks/useTheme";
 import { useRouter } from "expo-router";
 import Animated, {
@@ -44,95 +44,107 @@ export const useTopBar = ({
     const scrollY = useSharedValue(0);
     const isDragging = useSharedValue(false);
 
-    const Container = ({ children, style }: { children: ReactNode; style?: ViewStyle }) => {
-        const snap = (y: number, velocity: number = 0) => {
-            "worklet";
-            if (hideLargeTitle) return;
+    const stickyComponentRef = useRef(stickyComponent);
+    stickyComponentRef.current = stickyComponent;
 
-            const height = headerHeight.value;
-            if (height > 0 && y > 0 && y < height) {
-                if (Math.abs(velocity) < 100) {
-                    scrollTo(scrollRef, 0, y > height / 2 ? height : 0, true);
+    const titleRef = useRef(title);
+    titleRef.current = title;
+
+    const rightComponentRef = useRef(rightComponent);
+    rightComponentRef.current = rightComponent;
+
+    const Container = useMemo(() => {
+        const StableContainer = ({ children, style }: { children: ReactNode; style?: ViewStyle }) => {
+            const snap = (y: number, velocity: number = 0) => {
+                "worklet";
+                if (hideLargeTitle) return;
+
+                const height = headerHeight.value;
+                if (height > 0 && y > 0 && y < height) {
+                    if (Math.abs(velocity) < 100) {
+                        scrollTo(scrollRef, 0, y > height / 2 ? height : 0, true);
+                    }
                 }
-            }
-        };
+            };
 
-        const scrollHandler = useAnimatedScrollHandler({
-            onScroll: (event) => {
-                scrollY.value = event.contentOffset.y;
-            },
-            onBeginDrag: () => {
-                isDragging.value = true;
-            },
-            onEndDrag: (event) => {
-                isDragging.value = false;
-                snap(event.contentOffset.y, event.velocity?.y);
-            },
-            onMomentumEnd: (event) => {
-                if (isDragging.value) return;
-                snap(event.contentOffset.y, 0);
-            },
-        });
+            const scrollHandler = useAnimatedScrollHandler({
+                onScroll: (event) => {
+                    scrollY.value = event.contentOffset.y;
+                },
+                onBeginDrag: () => {
+                    isDragging.value = true;
+                },
+                onEndDrag: (event) => {
+                    isDragging.value = false;
+                    snap(event.contentOffset.y, event.velocity?.y);
+                },
+                onMomentumEnd: (event) => {
+                    if (isDragging.value) return;
+                    snap(event.contentOffset.y, 0);
+                },
+            });
 
-        return (
-            <View style={{ flex: 1 }}>
-                <TopBar
-                    title={title}
-                    showBackButton={showBackButton}
-                    rightComponent={rightComponent}
-                    scrollY={scrollY}
-                    headerHeight={headerHeight}
-                    hideLargeTitle={hideLargeTitle}
-                />
+            return (
+                <View style={{ flex: 1 }}>
+                    <TopBar
+                        title={titleRef.current}
+                        showBackButton={showBackButton}
+                        rightComponent={rightComponentRef.current}
+                        scrollY={scrollY}
+                        headerHeight={headerHeight}
+                        hideLargeTitle={hideLargeTitle}
+                    />
 
-                <Animated.ScrollView
-                    ref={scrollRef}
-                    onScroll={scrollHandler}
-                    scrollEventThrottle={16}
-                    stickyHeaderIndices={stickyComponent ? [1] : undefined}
-                    contentContainerStyle={[
-                        {
-                            paddingTop: topBarHeight + insets.top,
-                            minHeight: windowHeight + measuredHeaderHeight,
-                            paddingBottom: insets.bottom + (addBottomPadding ? 64 : 0),
-                        },
-                        style,
-                    ]}
-                    showsVerticalScrollIndicator={false}
-                >
-                    {!hideLargeTitle && (
-                        <View style={{ zIndex: 20 }}>
-                            <LargeHeader
-                                title={title}
-                                onLayout={(e) => {
-                                    const height = e.nativeEvent.layout.height;
-                                    headerHeight.value = height;
-                                    setMeasuredHeaderHeight(height);
-                                }}
-                            />
-                        </View>
-                    )}
-
-                    {hideLargeTitle && <View style={{ height: 16 }} />}
-
-                    {stickyComponent && (
-                        <View
-                            style={{
+                    <Animated.ScrollView
+                        ref={scrollRef}
+                        onScroll={scrollHandler}
+                        scrollEventThrottle={16}
+                        stickyHeaderIndices={stickyComponentRef.current ? [1] : undefined}
+                        contentContainerStyle={[
+                            {
                                 paddingTop: topBarHeight + insets.top,
-                                marginTop: -(topBarHeight + insets.top),
-                                backgroundColor: theme.colors.background,
-                                zIndex: 10,
-                            }}
-                        >
-                            {stickyComponent}
-                        </View>
-                    )}
+                                minHeight: windowHeight + measuredHeaderHeight,
+                                paddingBottom: insets.bottom + (addBottomPadding ? 64 : 0),
+                            },
+                            style,
+                        ]}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        {!hideLargeTitle && (
+                            <View style={{ zIndex: 20 }}>
+                                <LargeHeader
+                                    title={titleRef.current}
+                                    onLayout={(e) => {
+                                        const height = e.nativeEvent.layout.height;
+                                        headerHeight.value = height;
+                                        setMeasuredHeaderHeight(height);
+                                    }}
+                                />
+                            </View>
+                        )}
 
-                    {children}
-                </Animated.ScrollView>
-            </View>
-        );
-    };
+                        {hideLargeTitle && <View style={{ height: 16 }} />}
+
+                        {stickyComponentRef.current && (
+                            <View
+                                style={{
+                                    paddingTop: topBarHeight + insets.top,
+                                    marginTop: -(topBarHeight + insets.top),
+                                    backgroundColor: theme.colors.background,
+                                    zIndex: 10,
+                                }}
+                            >
+                                {stickyComponentRef.current}
+                            </View>
+                        )}
+
+                        {children}
+                    </Animated.ScrollView>
+                </View>
+            );
+        };
+        return StableContainer;
+    }, []);
 
     return { Container };
 };

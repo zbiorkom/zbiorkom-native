@@ -66,3 +66,7 @@ export const getTimeString = (timestamp: number) => {
         minute: "2-digit",
     });
 };
+
+export const dayKeyToDate = (dayKey: string) => {
+    return new Date((+dayKey + 18262) * 86400000);
+};
