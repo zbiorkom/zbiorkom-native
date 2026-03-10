@@ -8,7 +8,6 @@ import { useFetchQuery } from "~/hooks/useQuery";
 import { useCity } from "~/hooks/useBackend";
 import { Trip, ETrip, ERoute } from "~/tools/typings";
 import { useTheme } from "~/hooks/useTheme";
-import useMapSheets from "~/hooks/useMapSheets";
 import LoadingState from "@/ui/LoadingState";
 import RouteChip from "@/ui/RouteChip";
 import { BottomSheetView } from "@gorhom/bottom-sheet";
@@ -25,7 +24,6 @@ export default ({ tripIdx, onClose }: Props) => {
     const { theme } = useTheme();
     const { t } = useTranslation();
     const padding = useBottomSheetPadding();
-    const setTrip = useMapSheets((state) => state.setTrip);
 
     const { data: trip, loadingState } = useFetchQuery<Trip>(city.id, `trips/${tripIdx}/summary`, {
         enabled: tripIdx !== undefined,
@@ -34,8 +32,10 @@ export default ({ tripIdx, onClose }: Props) => {
 
     const handleShowFullTrip = () => {
         if (!trip) return;
-        setTrip(trip);
-        router.navigate("/(tabs)");
+        router.push({
+            pathname: "/(tabs)/map/trip/[id]",
+            params: { id: trip[ETrip.id], city: trip[ETrip.city], type: "trip" },
+        });
         onClose();
     };
 

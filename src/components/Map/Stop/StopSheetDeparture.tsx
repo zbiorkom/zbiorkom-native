@@ -3,13 +3,12 @@ import RouteChip from "@/ui/RouteChip";
 import StopTime from "@/ui/StopTime";
 import { StyleSheet, View } from "react-native";
 import { Text, TouchableRipple } from "react-native-paper";
-import { useShallow } from "zustand/shallow";
-import useMapSheets from "~/hooks/useMapSheets";
 import { useTheme } from "~/hooks/useTheme";
-import { EStopDeparture, EStopTime, ETrip, StopDeparture, StopDepartureStatus } from "~/tools/typings";
+import { EPosition, EStopDeparture, EStopTime, ETrip, StopDeparture, StopDepartureStatus } from "~/tools/typings";
+import { useRouter } from "expo-router";
 
 export default ({ departure }: { departure: StopDeparture }) => {
-    const [setPosition, setTrip] = useMapSheets(useShallow((state) => [state.setPosition, state.setTrip]));
+    const router = useRouter();
     const { theme, colorScheme } = useTheme();
     const darkMode = colorScheme === "dark";
 
@@ -22,9 +21,25 @@ export default ({ departure }: { departure: StopDeparture }) => {
                     departure[EStopDeparture.position] &&
                     departure[EStopDeparture.stopTime][EStopTime.status] === StopDepartureStatus.OnTrip
                 ) {
-                    setPosition(departure[EStopDeparture.position]!);
+                    const position = departure[EStopDeparture.position]!;
+                    router.push({
+                        pathname: "/(tabs)/map/trip/[id]",
+                        params: {
+                            id: position[EPosition.id],
+                            city: position[EPosition.city],
+                            type: "position",
+                        },
+                    });
                 } else {
-                    setTrip(departure[EStopDeparture.trip]);
+                    const trip = departure[EStopDeparture.trip];
+                    router.push({
+                        pathname: "/(tabs)/map/trip/[id]",
+                        params: {
+                            id: trip[ETrip.id],
+                            city: trip[ETrip.city],
+                            type: "trip",
+                        },
+                    });
                 }
             }}
         >

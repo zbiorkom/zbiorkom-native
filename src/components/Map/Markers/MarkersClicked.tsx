@@ -3,42 +3,61 @@ import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { StyleSheet } from "react-native";
 import { List, TouchableRipple } from "react-native-paper";
 import { useShallow } from "zustand/shallow";
-import useMapSheets from "~/hooks/useMapSheets";
-import VehicleMarker from "../Markers/PositionMarker";
-import StopMarker from "../Markers/StopMarker";
+import useMapMarkers from "~/hooks/useMapMarkers";
+import PositionMarker from "@/Map/Markers/PositionMarker";
+import StopMarker from "@/Map/Markers/StopMarker";
 import { useTheme } from "~/hooks/useTheme";
 import { darkFilter } from "~/tools/constants";
 import useSettings from "~/hooks/useSettings";
-import { EStop } from "~/tools/typings";
+import { EPosition, EStop } from "~/tools/typings";
+import { useRouter } from "expo-router";
 
-export default ({ open }: { open: boolean }) => {
+export default () => {
     const { showBrigade, showFleet, useStopCode } = useSettings();
     const { theme, colorScheme } = useTheme();
     const padding = useBottomSheetPadding();
-    const [markersClicked, setStop, setPosition, goBack] = useMapSheets(
-        useShallow((state) => [state.markersClicked, state.setStop, state.setPosition, state.goBack]),
+    const router = useRouter();
+    const [markersClicked, clear] = useMapMarkers(
+        useShallow((state) => [state.markersClicked, state.clear]),
     );
 
-    if (!markersClicked) return null;
-
     return (
-        <BottomSheet open={open} backdrop onClose={goBack}>
+        <BottomSheet
+            open={!!markersClicked}
+            backdrop
+            onClose={() => clear()}
+        >
             <BottomSheetScrollView contentContainerStyle={[padding, styles.container]}>
                 {markersClicked?.map((marker, index) => {
                     if (marker.position) {
+                        const position =
+                            typeof marker.position === "string"
+                                ? JSON.parse(marker.position)
+                                : marker.position;
+
                         return (
                             <TouchableRipple
                                 key={`marker-clicked-ripple-${index}`}
                                 borderless
-                                onPress={() => setPosition(marker.position!)}
+                                onPress={() => {
+                                    clear();
+                                    router.push({
+                                        pathname: "/(tabs)/map/trip/[id]",
+                                        params: {
+                                            id: position[EPosition.id],
+                                            city: position[EPosition.city],
+                                            type: "position",
+                                        },
+                                    });
+                                }}
                                 style={[
                                     styles.button,
                                     styles.vehicleButton,
                                     { backgroundColor: theme.colors.elevation.level3 },
                                 ]}
                             >
-                                <VehicleMarker
-                                    position={marker.position}
+                                <PositionMarker
+                                    position={position}
                                     showBrigade={showBrigade}
                                     showFleet={showFleet}
                                     style={colorScheme === "dark" && darkFilter}
@@ -46,11 +65,25 @@ export default ({ open }: { open: boolean }) => {
                             </TouchableRipple>
                         );
                     } else if (marker.stop) {
+                        const stop =
+                            typeof marker.stop === "string"
+                                ? JSON.parse(marker.stop)
+                                : marker.stop;
+
                         return (
                             <TouchableRipple
                                 key={`marker-clicked-ripple-${index}`}
                                 borderless
-                                onPress={() => setStop(marker.stop!)}
+                                onPress={() => {
+                                    clear();
+                                    router.push({
+                                        pathname: "/(tabs)/map/stop/[id]",
+                                        params: {
+                                            id: stop[EStop.id],
+                                            city: stop[EStop.city],
+                                        },
+                                    });
+                                }}
                                 style={[
                                     styles.button,
                                     styles.stopButton,
@@ -60,15 +93,15 @@ export default ({ open }: { open: boolean }) => {
                                 <List.Item
                                     left={({ style }) => (
                                         <StopMarker
-                                            stop={marker.stop!}
+                                            stop={stop}
                                             useStopCode={useStopCode}
                                             style={[style, colorScheme === "dark" && darkFilter]}
                                         />
                                     )}
-                                    title={`${marker.stop[EStop.name]} ${marker.stop[EStop.code] || ""}`}
+                                    title={`${stop[EStop.name]} ${stop[EStop.code] || ""}`}
                                     description={
-                                        marker.stop[EStop.direction]
-                                            ? `➜ ${marker.stop[EStop.direction]}`
+                                        stop[EStop.direction]
+                                            ? `➜ ${stop[EStop.direction]}`
                                             : undefined
                                     }
                                     descriptionNumberOfLines={1}

@@ -11,6 +11,7 @@ import { MarkerView } from "@maplibre/maplibre-react-native";
 import AnimatedMarker from "./AnimatedMarker";
 import { useCity } from "~/hooks/useBackend";
 import { DotPosition, EPosition, EStop, Position, Stop } from "~/tools/typings";
+import MarkersClicked from "./MarkersClicked";
 
 export default () => {
     const [bounds, zoom] = useMapView(useShallow((state) => [state.bounds!, state.zoom!]));
@@ -25,27 +26,31 @@ export default () => {
     });
 
     return (
-        <Portal host="map">
-            {initialData?.stops?.map((stop) => (
-                <MarkerView coordinate={stop[EStop.location]} key={stop[EStop.id]}>
-                    <StopMarker stop={stop} useStopCode={useStopCode} />
-                </MarkerView>
-            ))}
+        <>
+            <Portal host="map">
+                {initialData?.stops?.map((stop) => (
+                    <MarkerView coordinate={stop[EStop.location]} key={stop[EStop.id]}>
+                        <StopMarker stop={stop} useStopCode={useStopCode} />
+                    </MarkerView>
+                ))}
 
-            {data?.positions?.map((position) => (
-                <AnimatedMarker coordinate={position[EPosition.location]} key={position[EPosition.id]}>
-                    <PositionMarker position={position} showBrigade={showBrigade} showFleet={showFleet} />
-                </AnimatedMarker>
-            ))}
+                {data?.positions?.map((position) => (
+                    <AnimatedMarker coordinate={position[EPosition.location]} key={position[EPosition.id]}>
+                        <PositionMarker position={position} showBrigade={showBrigade} showFleet={showFleet} />
+                    </AnimatedMarker>
+                ))}
 
-            {data?.dots && <DotPositions dotPositions={data.dots} />}
+                {data?.dots && <DotPositions dotPositions={data.dots} />}
 
-            <InteractiveMarkers
-                positions={data?.positions || []}
-                stops={initialData?.stops || []}
-                showBrigade={showBrigade}
-                showFleet={showFleet}
-            />
-        </Portal>
+                <InteractiveMarkers
+                    positions={data?.positions || []}
+                    stops={initialData?.stops || []}
+                    showBrigade={showBrigade}
+                    showFleet={showFleet}
+                />
+            </Portal>
+
+            <MarkersClicked />
+        </>
     );
 };

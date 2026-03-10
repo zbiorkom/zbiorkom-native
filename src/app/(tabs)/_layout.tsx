@@ -19,7 +19,7 @@ export default () => {
             tabBar={(props) => <BottomBar {...props} />}
         >
             <Tabs.Screen
-                name="index"
+                name="map"
                 options={{
                     tabBarIcon: ({ color }) => <Icon source="map" size={24} color={color} />,
                 }}

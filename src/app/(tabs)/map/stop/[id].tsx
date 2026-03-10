@@ -1,39 +1,35 @@
 import BottomSheet from "@/BottomSheet";
 import { MarkerView } from "@maplibre/maplibre-react-native";
-import { useShallow } from "zustand/shallow";
 import { Portal } from "~/hooks/Portal";
-import useMapSheets from "~/hooks/useMapSheets";
-import StopMarker from "../Markers/StopMarker";
 import useSettings from "~/hooks/useSettings";
-import StopSheetHeader from "./StopSheetHeader";
+import StopMarker from "@/Map/Markers/StopMarker";
+import AnimatedMarker from "@/Map/Markers/AnimatedMarker";
+import PositionMarker from "@/Map/Markers/PositionMarker";
+import LoadingState from "@/ui/LoadingState";
 import { useEffect, useMemo } from "react";
 import { useMapNavigate } from "~/hooks/useMapView";
-import { EPosition, EStop, EStopDeparture, Position, Stop, StopDeparture } from "~/tools/typings";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEventQuery } from "~/hooks/useQuery";
-import StopSheetContent from "./StopSheetContent";
-import AnimatedMarker from "../Markers/AnimatedMarker";
-import PositionMarker from "../Markers/PositionMarker";
-import LoadingState from "@/ui/LoadingState";
+import { EPosition, EStop, Position, Stop, StopDeparture, EStopDeparture } from "~/tools/typings";
+import StopSheetHeader from "@/Map/Stop/StopSheetHeader";
+import StopSheetContent from "@/Map/Stop/StopSheetContent";
 
-export default ({ open }: { open: boolean }) => {
-    const [stop, goBack] = useMapSheets(useShallow((state) => [state.stop, state.goBack]));
+export default () => {
+    const { id, city } = useLocalSearchParams<{ id: string; city: string }>();
+    const router = useRouter();
     const { useStopCode } = useSettings();
     const navigateTo = useMapNavigate();
 
-    useEffect(() => {
-        if (!open || !stop) return;
-
-        navigateTo(stop[EStop.location], 16);
-    }, [open, stop]);
-
-    const { data, loadingState } = useEventQuery<StopDeparture[], Stop>(
-        stop?.[EStop.city],
-        `stops/${stop?.[EStop.id]}/stream`,
-        {
-            enabled: open && !!stop,
-            resetDataOnKeyChange: true,
-        },
+    const { data, initialData: stop, loadingState } = useEventQuery<StopDeparture[], Stop>(
+        city,
+        `stops/${id}/stream`,
+        { enabled: !!id && !!city, resetDataOnKeyChange: true },
     );
+
+    useEffect(() => {
+        if (!stop) return;
+        navigateTo(stop[EStop.location], 16);
+    }, [stop]);
 
     const uniquePositions = useMemo(() => {
         const positions: Position[] = [];
@@ -51,28 +47,31 @@ export default ({ open }: { open: boolean }) => {
         return positions;
     }, [data]);
 
-    if (!stop) return null;
-
     return (
         <>
             <BottomSheet
-                open={open}
+                open={true}
                 dynamicSizing={false}
-                headerLeftComponent={<StopSheetHeader stop={stop} />}
+                headerLeftComponent={stop ? <StopSheetHeader stop={stop} /> : undefined}
                 headerActions={[
                     {
                         icon: "dots-vertical",
                         onPress: () => {},
                     },
                 ]}
-                onClose={goBack}
+                onClose={(isSwipeDown) => {
+                    if (isSwipeDown) {
+                        router.navigate("/(tabs)/map");
+                    } else {
+                        router.back();
+                    }
+                }}
             >
                 <LoadingState loadingState={loadingState} />
-
                 <StopSheetContent departures={data} />
             </BottomSheet>
 
-            {open && (
+            {stop && (
                 <Portal host="map">
                     <MarkerView coordinate={stop[EStop.location]} key={stop[EStop.id]}>
                         <StopMarker stop={stop} useStopCode={useStopCode} />

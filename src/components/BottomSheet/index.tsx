@@ -26,24 +26,29 @@ export default ({
     onClose,
 }: Props) => {
     const bottomSheetRef = useRef<BottomSheetModal>(null);
-    const isProgrammaticDismiss = useRef(false);
+    const skipDismiss = useRef(false);
+    const isMounted = useRef(true);
     const { theme } = useTheme();
+
+    useEffect(() => {
+        return () => { isMounted.current = false; };
+    }, []);
 
     useEffect(() => {
         if (!bottomSheetRef.current) return;
 
         if (open) {
-            isProgrammaticDismiss.current = false;
+            skipDismiss.current = false;
             bottomSheetRef.current.present();
         } else {
-            isProgrammaticDismiss.current = true;
+            skipDismiss.current = true;
             bottomSheetRef.current.dismiss();
         }
     }, [open, bottomSheetRef]);
 
     const handleDismiss = useCallback(() => {
-        if (isProgrammaticDismiss.current) {
-            isProgrammaticDismiss.current = false;
+        if (skipDismiss.current || !isMounted.current) {
+            skipDismiss.current = false;
             return;
         }
 
@@ -51,6 +56,7 @@ export default ({
     }, [onClose]);
 
     useSystemBack(() => {
+        skipDismiss.current = true;
         onClose?.(false);
 
         return true;
