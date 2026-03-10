@@ -1,7 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Text } from "react-native-paper";
+import { Text, TouchableRipple } from "react-native-paper";
 import Svg, { Circle, Line } from "react-native-svg";
+import { useRouter } from "expo-router";
 import { useTheme } from "~/hooks/useTheme";
 import {
     RouteGraphDirection,
@@ -24,11 +25,15 @@ const BRANCH_DOT_CENTER = LEFT_PADDING + BRANCH_OFFSET + STOP_DOT_SIZE / 2;
 type RouteStopsListProps = {
     direction: RouteGraphDirection;
     routeColor: string;
+    routeId: string;
 };
 
-const RouteStopsList = ({ direction, routeColor }: RouteStopsListProps) => {
+// FIXME: AI SLOP
+
+const RouteStopsList = ({ direction, routeColor, routeId }: RouteStopsListProps) => {
     const { stops, connections } = direction;
     const { theme, colorScheme } = useTheme();
+    const router = useRouter();
 
     const routeTheme = new (colorScheme === "dark" ? DarkScheme : LightScheme)(routeColor);
 
@@ -88,42 +93,50 @@ const RouteStopsList = ({ direction, routeColor }: RouteStopsListProps) => {
                 const dotColor = isNormal ? mainColor : branchColor;
 
                 return (
-                    <View key={`${stop[EStop.id]}-${index}`} style={styles.stopRow}>
-                        <View style={{ width: BRANCH_DOT_CENTER + STOP_DOT_SIZE, height: STOP_ROW_HEIGHT }}>
-                            <Svg
-                                width={STOP_DOT_SIZE}
-                                height={STOP_DOT_SIZE}
-                                style={{
-                                    position: "absolute",
-                                    left: nodeX - STOP_DOT_SIZE / 2,
-                                    top: STOP_ROW_HEIGHT / 2 - STOP_DOT_SIZE / 2,
-                                    zIndex: 1,
-                                }}
-                            >
-                                <Circle
-                                    cx={STOP_DOT_SIZE / 2}
-                                    cy={STOP_DOT_SIZE / 2}
-                                    r={STOP_DOT_SIZE / 2 - 1}
-                                    fill={dotColor}
-                                    stroke={theme.colors.background}
-                                    strokeWidth={2}
-                                />
-                            </Svg>
-                        </View>
+                    <TouchableRipple
+                        key={`${stop[EStop.id]}-${index}`}
+                        style={styles.stopRow}
+                        onPress={() => {
+                            router.push(`/schedule/${routeId}/stop/${stop[EStop.id]}`);
+                        }}
+                    >
+                        <>
+                            <View style={{ width: BRANCH_DOT_CENTER + STOP_DOT_SIZE, height: STOP_ROW_HEIGHT }}>
+                                <Svg
+                                    width={STOP_DOT_SIZE}
+                                    height={STOP_DOT_SIZE}
+                                    style={{
+                                        position: "absolute",
+                                        left: nodeX - STOP_DOT_SIZE / 2,
+                                        top: STOP_ROW_HEIGHT / 2 - STOP_DOT_SIZE / 2,
+                                        zIndex: 1,
+                                    }}
+                                >
+                                    <Circle
+                                        cx={STOP_DOT_SIZE / 2}
+                                        cy={STOP_DOT_SIZE / 2}
+                                        r={STOP_DOT_SIZE / 2 - 1}
+                                        fill={dotColor}
+                                        stroke={theme.colors.background}
+                                        strokeWidth={2}
+                                    />
+                                </Svg>
+                            </View>
 
-                        <Text
-                            style={[
-                                styles.stopName,
-                                {
-                                    color: theme.colors.onBackground,
-                                    marginLeft: nodeType === EDirectionNodeType.Branch ? BRANCH_OFFSET : 0,
-                                },
-                            ]}
-                            numberOfLines={1}
-                        >
-                            {stop[EStop.name]} {stop[EStop.code] || ""}
-                        </Text>
-                    </View>
+                            <Text
+                                style={[
+                                    styles.stopName,
+                                    {
+                                        color: theme.colors.onBackground,
+                                        marginLeft: nodeType === EDirectionNodeType.Branch ? BRANCH_OFFSET : 0,
+                                    },
+                                ]}
+                                numberOfLines={1}
+                            >
+                                {stop[EStop.name]} {stop[EStop.code] || ""}
+                            </Text>
+                        </>
+                    </TouchableRipple>
                 );
             })}
         </View>
@@ -140,9 +153,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         height: STOP_ROW_HEIGHT,
-    },
-    svgContainer: {
-        overflow: "visible",
     },
     stopName: {
         fontSize: 15,

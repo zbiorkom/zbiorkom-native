@@ -1,11 +1,11 @@
 import { StyleSheet, View } from "react-native";
 import IconButton from "@/ui/IconButton";
 
-export type BottomSheetHeaderActions = { icon: string; onPress: () => void }[];
+export type BottomSheetHeaderAction = { icon: string; onPress: () => void };
 
 type Props = {
     leftComponent: React.ReactNode;
-    actions?: BottomSheetHeaderActions;
+    actions?: BottomSheetHeaderAction[];
 };
 
 export default ({ leftComponent, actions }: Props) => {

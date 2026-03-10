@@ -77,6 +77,7 @@ export default () => {
                 <RouteStopsList
                     direction={data.graph[selectedDirection]}
                     routeColor={data.route[ERoute.color]}
+                    routeId={route as string}
                 />
             )}
         </Container>

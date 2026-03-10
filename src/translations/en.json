@@ -32,5 +32,14 @@
         "grant_location": "Grant location access",
         "search_city": "Find a city",
         "select_city": "Select city"
+    },
+    "days": {
+        "0": "Su",
+        "1": "Mo",
+        "2": "Tu",
+        "3": "We",
+        "4": "Th",
+        "5": "Fr",
+        "6": "Sa"
     }
 }

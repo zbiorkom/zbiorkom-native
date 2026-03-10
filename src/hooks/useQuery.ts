@@ -12,11 +12,18 @@ type FetchQueryResult<T> = {
     loadingState?: QueryLoadingState;
 };
 
+export type FetchQueryOptions = {
+    enabled?: boolean;
+    resetDataOnKeyChange?: boolean;
+};
+
 export function useFetchQuery<T = any>(
     city: string | undefined,
     endpoint: string,
-    enabled: boolean = true,
+    options: FetchQueryOptions = {},
 ): FetchQueryResult<T> {
+    const { enabled = true, resetDataOnKeyChange = false } = options;
+
     const [data, setData] = useState<T>();
     const [isLoading, setIsLoading] = useState<boolean>(enabled);
     const [error, setError] = useState<string>();
@@ -52,7 +59,17 @@ export function useFetchQuery<T = any>(
         };
 
         fetchData();
-    }, [city, endpoint, enabled, data]);
+    }, [city, endpoint, enabled, data, resetDataOnKeyChange]);
+
+    useEffect(() => {
+        if (enabled) return;
+
+        return () => {
+            if (resetDataOnKeyChange) {
+                setData(undefined);
+            }
+        };
+    }, [city, endpoint, enabled, resetDataOnKeyChange]);
 
     return {
         data,
@@ -108,10 +125,6 @@ export function useEventQuery<T = any, I = T>(
         keyRef.current = key;
 
         setIsLoading(true);
-        if (resetDataOnKeyChange) {
-            setData(undefined);
-            setInitialData(undefined);
-        }
         setError(undefined);
         prevEsRef.current = esRef.current;
 
@@ -183,6 +196,22 @@ export function useEventQuery<T = any, I = T>(
             keyRef.current = null;
         };
     }, [city, endpoint, enabled, retryCount]);
+
+    useEffect(() => {
+        if (enabled) return;
+
+        return () => {
+            if (resetDataOnKeyChange) {
+                setData(undefined);
+                setInitialData(undefined);
+            }
+        };
+    }, [
+        city,
+        endpoint,
+        enabled,
+        resetDataOnKeyChange,
+    ]);
 
     return {
         data: error ? undefined : data,

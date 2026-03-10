@@ -38,5 +38,14 @@
         "grant_location": "Udostępnij lokalizację",
         "search_city": "Znajdź miasto",
         "select_city": "Wybierz miasto"
+    },
+    "days": {
+        "0": "Nd",
+        "1": "Pn",
+        "2": "Wt",
+        "3": "Śr",
+        "4": "Cz",
+        "5": "Pt",
+        "6": "So"
     }
 }

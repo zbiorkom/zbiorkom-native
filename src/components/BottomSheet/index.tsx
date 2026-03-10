@@ -2,7 +2,7 @@ import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useTheme } from "~/hooks/useTheme";
 import { useCallback, useEffect, useRef } from "react";
 import useSystemBack from "~/hooks/useSystemBack";
-import BottomSheetHeader, { BottomSheetHeaderActions } from "./BottomSheetHeader";
+import BottomSheetHeader, { BottomSheetHeaderAction } from "./BottomSheetHeader";
 import { Dimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -11,7 +11,7 @@ type Props = {
     backdrop?: boolean;
     dynamicSizing?: boolean;
     headerLeftComponent?: React.ReactNode;
-    headerActions?: BottomSheetHeaderActions;
+    headerActions?: (BottomSheetHeaderAction | false | undefined)[];
     children: React.ReactNode;
     onClose?: (isSwipeDown?: boolean) => void;
 };
@@ -65,7 +65,10 @@ export default ({
             backgroundStyle={{ backgroundColor: theme.colors.surface }}
             handleIndicatorStyle={{ backgroundColor: theme.colors.onSurfaceVariant }}
             handleComponent={() => (
-                <BottomSheetHeader leftComponent={headerLeftComponent} actions={headerActions} />
+                <BottomSheetHeader
+                    leftComponent={headerLeftComponent}
+                    actions={headerActions?.filter((action): action is BottomSheetHeaderAction => !!action)}
+                />
             )}
             backdropComponent={
                 backdrop
@@ -73,7 +76,7 @@ export default ({
                     : undefined
             }
             onDismiss={handleDismiss}
-            snapPoints={["30%", "60%"]}
+            snapPoints={!dynamicSizing ? ["30%", "60%"] : undefined}
             maxDynamicContentSize={Dimensions.get("window").height * 0.6}
             children={children}
         />
