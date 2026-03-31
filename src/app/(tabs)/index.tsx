@@ -1,5 +1,3 @@
 import { Redirect } from "expo-router";
 
-export default () => {
-    return <Redirect href="/(tabs)/map" />;
-};
+export default () => <Redirect href="/(tabs)/map" />;

@@ -5,10 +5,11 @@ import TripItinerary from "@/Map/TripItinerary";
 import AnimatedMarker from "@/Map/Markers/AnimatedMarker";
 import PositionMarker from "@/Map/Markers/PositionMarker";
 import LoadingState from "@/ui/LoadingState";
-import { useEffect } from "react";
-import { useMapFitBounds } from "~/hooks/useMapView";
+import { useCallback, useEffect, useRef, useState } from "react";
+import useMapView, { useMapFitBounds } from "~/hooks/useMapView";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEventQuery } from "~/hooks/useQuery";
+import { Dimensions } from "react-native";
 import {
     EItinerary,
     EItineraryStop,
@@ -30,6 +31,9 @@ export default () => {
     const { showBrigade, showFleet } = useSettings();
     const fitBounds = useMapFitBounds();
 
+    const [isFollowing, setIsFollowing] = useState(true);
+    const isFirstLoad = useRef(true);
+
     const endpoint = type === "position" ? `positions/${id}/stream` : `trips/${id}/stream`;
 
     const { data, initialData, loadingState } = useEventQuery<
@@ -40,34 +44,92 @@ export default () => {
         resetDataOnKeyChange: true,
     });
 
+    const hasPosition = !!data?.position;
+
+    // Detect user map interaction → disable follow
     useEffect(() => {
-        if (!data) return;
+        const unsub = useMapView.subscribe((state) => {
+            if (state.userMovedMap) {
+                setIsFollowing(false);
+                useMapView.getState().setUserMovedMap(false);
+            }
+        });
+        return unsub;
+    }, []);
 
-        const itineraryStops = initialData?.itinerary?.[EItinerary.stops];
-        if (!itineraryStops || itineraryStops.length < 2) return;
+    // Reset on unmount
+    useEffect(() => {
+        return () => {
+            useMapView.getState().setUserMovedMap(false);
+        };
+    }, []);
 
-        const seq = data.sequence;
-        const lastIndex = itineraryStops.length - 1;
+    const doFitBounds = useCallback(
+        (animated: boolean) => {
+            if (!data?.position) return;
 
-        let idx1: number;
-        let idx2: number;
+            const itineraryStops = initialData?.itinerary?.[EItinerary.stops];
+            if (!itineraryStops || itineraryStops.length < 2) return;
 
-        if (seq - 1 >= lastIndex) {
-            idx1 = lastIndex - 1;
-            idx2 = lastIndex;
-        } else {
-            idx1 = seq - 1;
-            idx2 = seq;
+            const vehicleLoc = data.position[EPosition.location];
+            const seq = data.sequence;
+            const lastIndex = itineraryStops.length - 1;
+
+            const nextIdx = seq >= lastIndex ? lastIndex : seq;
+            const nextStopLoc = itineraryStops[nextIdx][EItineraryStop.stop][EStop.location];
+
+            const ne: GeoJSON.Position = [
+                Math.max(vehicleLoc[0], nextStopLoc[0]),
+                Math.max(vehicleLoc[1], nextStopLoc[1]),
+            ];
+            const sw: GeoJSON.Position = [
+                Math.min(vehicleLoc[0], nextStopLoc[0]),
+                Math.min(vehicleLoc[1], nextStopLoc[1]),
+            ];
+
+            fitBounds(ne, sw, {
+                padding: {
+                    paddingLeft: 80,
+                    paddingRight: 80,
+                    paddingTop: 80,
+                    paddingBottom: Dimensions.get("window").height * 0.4,
+                },
+                zoomLevel: 16,
+                animationDuration: animated ? 500 : 0,
+            });
+        },
+        [data?.position, data?.sequence, initialData?.itinerary, fitBounds],
+    );
+
+    // On first data load or when following + position/sequence changes
+    useEffect(() => {
+        if (!data?.position) return;
+
+        if (isFirstLoad.current) {
+            isFirstLoad.current = false;
+            doFitBounds(false);
+            return;
         }
 
-        const loc1 = itineraryStops[idx1][EItineraryStop.stop][EStop.location];
-        const loc2 = itineraryStops[idx2][EItineraryStop.stop][EStop.location];
-
-        const ne: GeoJSON.Position = [Math.max(loc1[0], loc2[0]), Math.max(loc1[1], loc2[1])];
-        const sw: GeoJSON.Position = [Math.min(loc1[0], loc2[0]), Math.min(loc1[1], loc2[1])];
-
-        fitBounds(ne, sw);
+        if (isFollowing) {
+            doFitBounds(true);
+        }
     }, [data?.position, data?.sequence]);
+
+    // When follow is re-activated
+    useEffect(() => {
+        if (isFollowing && !isFirstLoad.current && data?.position) {
+            doFitBounds(true);
+        }
+    }, [isFollowing]);
+
+    const handleUserScroll = useCallback(() => {
+        setIsFollowing(false);
+    }, []);
+
+    const handleFollowPress = useCallback(() => {
+        setIsFollowing((prev) => !prev);
+    }, []);
 
     return (
         <>
@@ -76,6 +138,10 @@ export default () => {
                 dynamicSizing={false}
                 headerLeftComponent={<TripSheetHeader trip={initialData?.trip} />}
                 headerActions={[
+                    hasPosition && {
+                        icon: isFollowing ? "crosshairs-gps" : "crosshairs",
+                        onPress: handleFollowPress,
+                    },
                     {
                         icon: "dots-vertical",
                         onPress: () => {},
@@ -96,6 +162,8 @@ export default () => {
                     stopTimes={data?.stops}
                     position={data?.position}
                     sequence={data?.sequence}
+                    isFollowing={isFollowing}
+                    onUserScroll={handleUserScroll}
                 />
             </BottomSheet>
 

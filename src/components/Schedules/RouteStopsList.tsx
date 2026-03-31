@@ -28,8 +28,6 @@ type RouteStopsListProps = {
     routeId: string;
 };
 
-// FIXME: AI SLOP
-
 const RouteStopsList = ({ direction, routeColor, routeId }: RouteStopsListProps) => {
     const { stops, connections } = direction;
     const { theme, colorScheme } = useTheme();

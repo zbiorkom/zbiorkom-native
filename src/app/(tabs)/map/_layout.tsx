@@ -114,6 +114,10 @@ export default () => {
                             bounds: properties.visibleBounds,
                             zoom: properties.zoomLevel,
                         });
+
+                        if (properties.isUserInteraction) {
+                            useMapView.getState().setUserMovedMap(true);
+                        }
                     }}
                     regionDidChangeDebounceTime={0}
                     onDidFinishLoadingMap={async () => {
